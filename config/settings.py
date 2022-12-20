@@ -44,10 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd part-apps
-    'crispy-forms'
-    'crispy-bootstrap'
+    'crispy_forms',
+    'crispy_bootstrap5',
 
     # local apps
+    't9a.apps.T9AConfig',
 ]
 
 MIDDLEWARE = [

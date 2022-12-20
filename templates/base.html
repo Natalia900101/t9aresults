@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> t9a {% block title %} {% endblock %}</title>
+
+    {%block styles%}
+        <link rel="stylesheet" href="{% static './css/bootstrap.min.css' %}">
+    {%endblock%}
+
+    {%block scripts%}
+        <script src="{% static './js/bootstrap.min.js' %}" async defer></script>
+    {%endblock%}
+</head>
+<body>
+{% include 'menu.html' %}
+</br>
+<div class="container">
+    <div class="row">
+        <div class="col">
+        {% block container %}
+
+        {% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+</html>
