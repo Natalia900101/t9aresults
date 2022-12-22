@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Lists
+{% endblock %}
+
+{% block container %}
+<ol>
+{% for list in lists %}
+<li>
+  {{list}} <pre>{{list.list}}<pre>
+</li>
+  {% endfor%}
+</ol>
+{% endblock %}
+

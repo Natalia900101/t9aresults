@@ -21,14 +21,14 @@ class Army(models.Model):
     long_name = models.CharField(max_length=256)
 
     def __str__(self):
-        return f'{self.id}. {self.name}'
+        return f'{self.name}'
 
 
 class Map(models.Model):
     name = models.CharField(max_length=256)
 
     def __str__(self):
-        return f'{self.id}. {self.name}'
+        return f'{self.name}'
 
 
 class Lists(models.Model):
@@ -36,6 +36,9 @@ class Lists(models.Model):
     army = models.ForeignKey('Army', null=True, on_delete=models.SET_NULL)
     list = models.TextField()
     name = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f'{self.army}, {self.name}'
 
 
 class Games(models.Model):
@@ -46,6 +49,9 @@ class Games(models.Model):
     turns = models.IntegerField()
     event = models.CharField(max_length=256)
     points_event = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.date}, {self.event}'
 
 
 class Results(models.Model):
@@ -63,3 +69,5 @@ class Results(models.Model):
     comment = models.TextField(blank=True)
     points = models.IntegerField()
     approved = models.BooleanField(null=True)
+
+

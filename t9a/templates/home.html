@@ -10,8 +10,13 @@ Home
 
 <h2> The 9th age results </h2>
 <div>
- <img src="{% static './images/onion-CoA.png' %}" class="img-fluid">
+
 </div>
+<ol>
+{% for result in results %}
+<li> {{result.score}}:{{result.opponent.score}}</li>
+{% endfor %}
+</ol>
 <br>
 
 {% endblock %}

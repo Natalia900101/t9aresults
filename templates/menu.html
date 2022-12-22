@@ -17,7 +17,9 @@
         {% if user.is_authenticated %}
         <li class="nav-item">
           <a class="nav-link" href=#>Welcome, You are logged in as {{ user.username }}</a>
-
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 't9a:results' %}">Results</a>
         </li>
         {% else %}
         <li class="nav-item">
