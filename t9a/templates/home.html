@@ -15,6 +15,7 @@ Home
 {% else %}
   <a href="{% provider_login_url 'google' %}">Login With Google</a>
 {% endif %}
+<br>
 {% for d in dep %}
   {{d}}<p></p>
 {% endfor %}
