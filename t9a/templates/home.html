@@ -9,16 +9,9 @@ Home
 {%block container%}
 
 <h2> The 9th age results </h2>
+ <img src="{% static './images/onion-CoA.png' %}">
 
-{% if user.is_authenticated %}
-  <p>Welcome, You are logged in as {{ user.username }}</p>
-{% else %}
-  <a href="{% provider_login_url 'google' %}">Login With Google</a>
-{% endif %}
 <br>
-{% for d in dep %}
-  {{d}}<p></p>
-{% endfor %}
 
 {% endblock %}
 

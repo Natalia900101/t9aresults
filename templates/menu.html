@@ -1,4 +1,6 @@
 {% load static %}
+{% load socialaccount %}
+
 <nav class="navbar" style="background-color:#6f42c1">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Menu</a>
@@ -10,12 +12,16 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
+        {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href=''</a>
+          <a class="nav-link" href=#>Welcome, You are logged in as {{ user.username }}</a>
+
         </li>
+        {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Pricing</a>
+          <a class="nav-link" href="{% provider_login_url 'google' %}">Login With Google</a>
         </li>
+        {% endif %}
         <li class="nav-item">
           <a class="nav-link disabled">Disabled</a>
         </li>
