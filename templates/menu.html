@@ -21,6 +21,10 @@
          <li class="nav-item">
           <a class="nav-link" href="{% url 't9a:results' %}">Results</a>
         </li>
+         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 't9a:my-account' %}">My account</a>
+        </li>
         {% else %}
         <li class="nav-item">
           <a class="nav-link" href="{% provider_login_url 'google' %}">Login With Google</a>

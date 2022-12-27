@@ -1,8 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 
+from .forms import UsernameForm
 from .models import Results, Lists
 
 
@@ -12,6 +14,34 @@ class HomeView(View):
             request,
             'home.html',
         )
+
+
+class ChangeUsernameView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = get_user_model().objects.get(id=self.request.user.id)
+        username = user.username
+        init = {
+            'username': username
+        }
+
+        form = UsernameForm(initial=init)
+        return render(
+            request,
+            'my-account.html',
+            context={
+                'form': form
+
+            }
+        )
+
+    def post(self, request):
+        user = get_user_model().objects.get(id=self.request.user.id)
+        username = self.request.POST.get('new_username')
+        user.username = username
+        user.save()
+
+        return redirect('t9a:home')
+
 
 
 class ResultView(LoginRequiredMixin, View):
@@ -24,7 +54,7 @@ class ResultView(LoginRequiredMixin, View):
             request,
             'results.html',
             context={
-               'results': my_result
+                'results': my_result
 
             }
         )
@@ -44,4 +74,3 @@ class ListsView(LoginRequiredMixin, View):
                 'lists': lists
             }
         )
-
