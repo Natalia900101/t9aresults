@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from . import forms
-from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm
+from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm
 from .models import Results, Lists, Games
 
 
@@ -82,6 +82,47 @@ class ListsView(LoginRequiredMixin, View):
         )
 
 
+class AddListView(LoginRequiredMixin, View):
+    def get(self, request, pk=0):
+        if pk == 0:
+            form = AddListForm()
+        else:
+            form = AddListForm(instance=Lists.objects.get(id=pk))
+            if len(Results.objects.filter(list_id=pk)) > 0:
+                form.fields['list'].disabled = True
+
+        return render(
+            request,
+            'add-list.html',
+            context={
+                'form': form
+            }
+        )
+
+    def post(self, request, pk=0):
+        form = {}
+        if pk != 0:
+            list = Lists.objects.get(id=pk)
+            if list:
+                if len(Results.objects.filter(list_id=list.id)) > 0:
+                    POST = request.POST.copy()
+                    POST['list'] = list.list
+                    form = AddListForm(POST)
+        if not form:
+            form = AddListForm(request.POST)
+        owner = self.request.user.id
+        if form.is_valid():
+            if pk != 0:
+                list = Lists.objects.get(id=pk)
+                if list:
+                    form.instance.id = list.id
+                    if len(Results.objects.filter(list_id=list.id)) > 0:
+                        form.instance.list = list.list
+            form.instance.owner_id = owner
+            form.save()
+        return ListsView.get(self, request, form.instance.id)
+
+
 class GameCreateView(View):
     def get(self, request):
         result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
@@ -142,7 +183,7 @@ class GameCreateView(View):
         form_op_result.instance.secondary = form_my_result.instance.secondary * -1
         form_op_result.instance.result = form_my_result.instance.result * -1
         form_op_result.instance.first = not form_my_result.instance.first
-      #  form_op_result.instance.result = None
+        #  form_op_result.instance.result = None
 
         fpr = form_op_result.save(commit=False)
         fpr.save()

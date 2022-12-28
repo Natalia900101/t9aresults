@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from t9a.models import Games, Results
+from t9a.models import Games, Results, Lists
 
 
 class UsernameForm(forms.ModelForm):
@@ -31,3 +31,9 @@ class OpResultForm(forms.ModelForm):
     class Meta:
         model = Results
         fields = ('player', 'points', 'list')
+
+
+class AddListForm(forms.ModelForm):
+    class Meta:
+        model = Lists
+        fields = ('army', 'name', 'list')

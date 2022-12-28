@@ -8,7 +8,8 @@
 <ol>
 {% for list in lists %}
 <li>
-  {{list}} <pre>{{list.list}}<pre>
+ <a href="{% url 't9a:add-list' pk=list.id %}">  {{list}}</a>
+  <pre>{{list.list}}<pre>
 </li>
   {% endfor%}
 </ol>
