@@ -56,9 +56,9 @@ class Games(models.Model):
 
 class Results(models.Model):
     choice_list = [
-        (1, 'winner'),
-        (2, 'draw'),
-        (3, 'loose')
+        (1, 'win'),
+        (0, 'draw'),
+        (-1, 'loose')
     ]
     game = models.ForeignKey('Games', null=True, on_delete=models.SET_NULL)
     player = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
@@ -69,5 +69,7 @@ class Results(models.Model):
     comment = models.TextField(blank=True)
     points = models.IntegerField()
     approved = models.BooleanField(null=True)
+    first = models.BooleanField(null=True)
 
-
+    def __str__(self):
+        return f'{self.game.date}, {self.game.id}, {self.player}'

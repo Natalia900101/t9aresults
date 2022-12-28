@@ -12,27 +12,29 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="{% url 't9a:home' %}">Home</a>
         </li>
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href=#>Welcome, You are logged in as {{ user.username }}</a>
+          <a class="nav-link" href="#">Welcome, You are logged in as {{ user.username }}</a>
         </li>
          <li class="nav-item">
           <a class="nav-link" href="{% url 't9a:results' %}">Results</a>
         </li>
-         </li>
          <li class="nav-item">
           <a class="nav-link" href="{% url 't9a:my-account' %}">My account</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 't9a:add-game' %}">Add game</a>
+        </li>
+             <li class="nav-item">
+          <a class="nav-link" href="{% url 't9a:logout' %}">LogOut</a>
         </li>
         {% else %}
         <li class="nav-item">
           <a class="nav-link" href="{% provider_login_url 'google' %}">Login With Google</a>
         </li>
         {% endif %}
-        <li class="nav-item">
-          <a class="nav-link disabled">Disabled</a>
-        </li>
       </ul>
     </div>
   </div>

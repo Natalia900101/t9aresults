@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Add game
+{% endblock %}
+
+{% block container %}
+<div>
+<form action="" method="post">
+      {% csrf_token %}
+    {{ form_game | crispy }}
+    <div style="border: 1px dashed darkgreen">{{ form_my_result | crispy}}</div>
+    <div style="border: 1px dashed darkred"> {{form_op_result | crispy}}</div>
+  <button type="submit" class="btn btn-success">Save game</button>
+</form>
+</div>
+{% endblock %}
