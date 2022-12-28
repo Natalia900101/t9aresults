@@ -48,8 +48,11 @@ class ChangeUsernameView(LoginRequiredMixin, View):
 
 
 class ResultView(LoginRequiredMixin, View):
-    def get(self, request):
-        my_result = Results.objects.filter(player_id=self.request.user.id)
+    def get(self, request, pk=0):
+        if pk == 0:
+            my_result = Results.objects.filter(player_id=self.request.user.id)
+        else:
+            my_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(game_id=pk))
         for r in my_result:
             r.opponent = Results.objects.get(~Q(player_id=self.request.user.id)
                                              & Q(game_id=r.game_id))
@@ -144,7 +147,7 @@ class GameCreateView(View):
         fpr = form_op_result.save(commit=False)
         fpr.save()
 
-        return redirect('t9a:home')
+        return ResultView.get(self, request, form_game.instance.id)
 
     def count_score(self, points, my, op, scenario):
         difference = my - op

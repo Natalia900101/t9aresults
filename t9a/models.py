@@ -37,8 +37,11 @@ class Lists(models.Model):
     list = models.TextField()
     name = models.CharField(max_length=256)
 
+    class Meta:
+        ordering = ['army', 'owner', 'name']
+
     def __str__(self):
-        return f'{self.army}, {self.name}'
+        return f'{self.army}, {self.owner}, {self.name}'
 
 
 class Games(models.Model):
