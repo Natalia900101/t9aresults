@@ -84,11 +84,11 @@ class ListsView(LoginRequiredMixin, View):
 
 class AddListView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
-        if pk == 0:
+        if pk == 0:                     # if there's no list view add new list
             form = AddListForm()
         else:
-            form = AddListForm(instance=Lists.objects.get(id=pk))
-            if len(Results.objects.filter(list_id=pk)) > 0:
+            form = AddListForm(instance=Lists.objects.get(id=pk))  # if list exist and list.id occurs in results
+            if len(Results.objects.filter(list_id=pk)) > 0:        # field 'list' is read only in form
                 form.fields['list'].disabled = True
 
         return render(
@@ -101,12 +101,12 @@ class AddListView(LoginRequiredMixin, View):
 
     def post(self, request, pk=0):
         form = {}
-        if pk != 0:
+        if pk != 0:                             # if list exist return that list
             list = Lists.objects.get(id=pk)
             if list:
-                if len(Results.objects.filter(list_id=list.id)) > 0:
-                    POST = request.POST.copy()
-                    POST['list'] = list.list
+                if len(Results.objects.filter(list_id=list.id)) > 0:    # if list is connection with results,
+                    POST = request.POST.copy()                          # it's display and don't send in POST
+                    POST['list'] = list.list                            # we copy POST and overwrite value field 'list'
                     form = AddListForm(POST)
         if not form:
             form = AddListForm(request.POST)
@@ -123,10 +123,10 @@ class AddListView(LoginRequiredMixin, View):
         return ListsView.get(self, request, form.instance.id)
 
 
-class GameCreateView(View):
+class GameCreateView(View):  # view to add games and results
     def get(self, request):
         result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
-        if result:
+        if result:  # in form is displayed last  introduced value
             event = Games.objects.get(id=result[0].game_id).event
             points_event = Games.objects.get(id=result[0].game_id).points_event
             list = result[0].list
@@ -135,19 +135,19 @@ class GameCreateView(View):
             points_event = 4500
             list = 0
 
-        init_game = {
+        init_game = {           # init value to game form
             'event': event,
             'points_event': points_event,
             'date': datetime.now().strftime("%Y-%m-%d")
         }
         form_game = GameForm(initial=init_game)
-        init_my_result = {
+        init_my_result = {      # init value to my result form
             'list': list
         }
         init_op_result = {
         }
-        form_my_result = MyResultForm(initial=init_my_result, prefix='my')
-        form_op_result = OpResultForm(initial=init_op_result, prefix='op')
+        form_my_result = MyResultForm(initial=init_my_result, prefix='my')  # we used prefix to distinctions form
+        form_op_result = OpResultForm(initial=init_op_result, prefix='op')  # there are that same fields
         return render(
             request,
             'add-game.html',
@@ -163,7 +163,7 @@ class GameCreateView(View):
         form_my_result = forms.MyResultForm(request.POST, prefix='my')
         form_op_result = forms.OpResultForm(request.POST, prefix='op')
         if form_game.is_valid() and form_my_result.is_valid() and form_op_result.is_valid():
-            fg = form_game.save(commit=False)
+            fg = form_game.save(commit=False)  # first we save game form because results have FG to game
             fg.save()
         else:
             raise ValidationError('Something went wrong.')
@@ -178,7 +178,7 @@ class GameCreateView(View):
         fmr = form_my_result.save(commit=False)
         fmr.save()
 
-        form_op_result.instance.game_id = form_game.instance.id
+        form_op_result.instance.game_id = form_game.instance.id   # we assign value to opponent result based on our form
         form_op_result.instance.score = 20 - score
         form_op_result.instance.secondary = form_my_result.instance.secondary * -1
         form_op_result.instance.result = form_my_result.instance.result * -1
@@ -190,7 +190,7 @@ class GameCreateView(View):
 
         return ResultView.get(self, request, form_game.instance.id)
 
-    def count_score(self, points, my, op, scenario):
+    def count_score(self, points, my, op, scenario): # function to count score used in Result
         difference = my - op
         fraction = abs(difference / points)
         score = 0
