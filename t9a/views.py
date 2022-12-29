@@ -1,11 +1,12 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model, logout
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views import View
+from django.views.generic import ListView
 
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm
@@ -123,7 +124,7 @@ class AddListView(LoginRequiredMixin, View):
         return ListsView.get(self, request, form.instance.id)
 
 
-class GameCreateView(View):  # view to add games and results
+class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
     def get(self, request):
         result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
         if result:  # in form is displayed last  introduced value
@@ -217,7 +218,35 @@ class GameCreateView(View):  # view to add games and results
         return score
 
 
+class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        return redirect('t9a:home')
+
+    def get(self, request, pk=0):
+        if pk == 0:
+            my_result = Results.objects.filter(player_id=self.request.user.id)
+        else:
+            my_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(game_id=pk))
+        for r in my_result:
+            r.opponent = Results.objects.get(~Q(player_id=self.request.user.id)
+                                             & Q(game_id=r.game_id))
+        return render(
+            request,
+            'results.html',
+            context={
+                'results': my_result
+
+            }
+        )
+
+
+
+
 class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('t9a:home')
+

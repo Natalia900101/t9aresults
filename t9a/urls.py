@@ -14,6 +14,7 @@ urlpatterns = [
     path('add-list/', views.AddListView.as_view(), name='add-list'),
     path('my-account/', views.ChangeUsernameView.as_view(), name='my-account'),
     path('add-game/', views.GameCreateView.as_view(), name='add-game'),
+    path('all-results/', views.AllResultsView.as_view(), name='all-results'),
     path('logout', views.LogoutView.as_view(), name='logout'),
 
 ]
