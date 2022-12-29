@@ -1,0 +1,9 @@
+.win {
+    background-color: lightgreen !important;
+}
+.loose {
+    background-color: lightpink !important;
+}
+.draw {
+    background-color: lightskyblue !important;
+}
