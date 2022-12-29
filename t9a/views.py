@@ -55,7 +55,7 @@ class ResultView(LoginRequiredMixin, View):
         else:
             my_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(game_id=pk))
         for r in my_result:
-            r.opponent = Results.objects.get(~Q(player_id=self.request.user.id)
+            r.opponent = Results.objects.get(~Q(player_id=r.player_id)
                                              & Q(game_id=r.game_id))
         return render(
             request,
@@ -226,22 +226,18 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
         return redirect('t9a:home')
 
     def get(self, request, pk=0):
-        if pk == 0:
-            my_result = Results.objects.filter(player_id=self.request.user.id)
-        else:
-            my_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(game_id=pk))
-        for r in my_result:
-            r.opponent = Results.objects.get(~Q(player_id=self.request.user.id)
+        all_results = Results.objects.filter(first=True)
+        for r in all_results:
+            r.opponent = Results.objects.get(~Q(player_id=r.player_id)
                                              & Q(game_id=r.game_id))
         return render(
             request,
-            'results.html',
+            'all-results.html',
             context={
-                'results': my_result
+                'all_results': all_results
 
             }
         )
-
 
 
 
