@@ -29,6 +29,7 @@ SECRET_KEY = os.environ.get('DJ_SECRET_KEY')
 DEBUG = int(os.environ.get('DJ_DEBUG', default=0))
 
 ALLOWED_HOSTS = ['wyniki.t9a.pl', '127.0.0.1']
++CSRF_TRUSTED_ORIGINS = ['https://wyniki.t9a.pl']
 
 # Application definition
 
