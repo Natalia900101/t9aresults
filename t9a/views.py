@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -10,14 +11,28 @@ from django.views.generic import ListView
 
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm
-from .models import Results, Lists, Games
+from .helpers import Ranking
+from .models import Results, Lists, Games, Army
 
 
 class HomeView(View):
     def get(self, request):
+        rankingL = Ranking(Lists)
+        rankingA = Ranking(Army)
+        rankingP = Ranking(User)
+        results = Results.objects.all()
+
+        for r in results:
+            rankingL.add(r.list_id, r.result, r.score)
+            rankingA.add(r.list.army_id, r.result, r.score)
+            rankingP.add(r.player_id, r.result, r.score)
+
         return render(
             request,
             'home.html',
+            context={
+                'rankings': [rankingP.get_list(), rankingL.get_list(), rankingA.get_list()]
+            }
         )
 
 

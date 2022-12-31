@@ -12,9 +12,34 @@ Home
 {% if user.is_authenticated %}
 <h2>Hello {{user.username}}!</h2>
 {% endif %}
+
+{% for r in rankings%}
 <div>
- <img src="{% static './images/onion-CoA.png' %}">
+  <table class="table table-bordered">
+    <tr>
+      <th> Player </th>
+      <th class="win"> win </th>
+      <th class="draw"> draw </th>
+      <th class="loose"> loose </th>
+      <th> Games </th>
+      <th>Total score</th>
+      <th>Avg. score</th>
+    </tr>
+    {% for result in r %}
+    <tr>
+      <td class="">{{result.object}}</td>
+      <td class="win">{{result.win}}</td>
+      <td class="draw">{{result.draw}}</td>
+      <td class="loose">{{result.loose}}</td>
+      <td class="">{{result.games}}</td>
+      <td>{{result.sum}}</td>
+      <td>{{result.avg | floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+  </table>
 </div>
+{% endfor %}
+
 
 
 {% endblock %}
