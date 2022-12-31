@@ -72,7 +72,7 @@ class Results(models.Model):
     comment = models.TextField(blank=True)
     points = models.IntegerField()
     approved = models.BooleanField(null=True)
-    first = models.BooleanField(null=True)
+    first = models.BooleanField()
 
     def __str__(self):
         return f'{self.game.date}, {self.game.id}, {self.player}'
