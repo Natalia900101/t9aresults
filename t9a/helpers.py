@@ -51,6 +51,7 @@ class Ranking:
         for id in self.r:
             self.r[id].object = all_map[id]
             all_list.append(self.r[id])
+        all_list.sort(key=lambda x: (x.win, x.draw, -x.loose), reverse=True)
         return all_list
 
     def __str__(self):
