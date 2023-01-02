@@ -8,5 +8,6 @@ EXPOSE $PORT
 
 ADD . /project
 WORKDIR /project
-CMD printenv && python manage.py makemigrations && python manage.py migrate
-    && python manage.py runserver 0.0.0.0:$PORT
+CMD python manage.py makemigrations && \
+    python manage.py migrate && \
+    python manage.py runserver 0.0.0.0:$PORT
