@@ -11,13 +11,13 @@ Home
 <h2> The 9th age results </h2>
 {% if user.is_authenticated %}
 <h2>Hello {{user.username}}!</h2>
-{% endif %}
 
-{% for r in rankings%}
 <div>
   <table class="table table-bordered">
+{% for r in rankings%}
+
     <tr>
-      <th> Player </th>
+      <th> </th>
       <th class="win"> win </th>
       <th class="draw"> draw </th>
       <th class="loose"> loose </th>
@@ -36,10 +36,11 @@ Home
       <td>{{result.avg | floatformat:2 }}</td>
     </tr>
     {% endfor %}
+
+{% endfor %}
   </table>
 </div>
-{% endfor %}
-
+{% endif %}
 
 
 {% endblock %}

@@ -26,12 +26,11 @@ class HomeView(View):
             rankingL.add(r.list_id, r.result, r.score)
             rankingA.add(r.list.army_id, r.result, r.score)
             rankingP.add(r.player_id, r.result, r.score)
-
         return render(
             request,
             'home.html',
             context={
-                'rankings': [rankingP.get_list(), rankingL.get_list(), rankingA.get_list()]
+                'rankings': [rankingP.get_list(), rankingA.get_list(), rankingL.get_list()]
             }
         )
 
