@@ -44,7 +44,6 @@ Home
       <th>Avg. score</th>
     </tr>
     {% for result in r %}
-      {% if result.opponent and result.opponent.list %}
     <tr>
       <td class="">{{result.object}}</td>
       <td class="win">{{result.win}}</td>
@@ -54,7 +53,6 @@ Home
       <td>{{result.sum}}</td>
       <td>{{result.avg | floatformat:2 }}</td>
     </tr>
-      {% endif %}
     {% endfor %}
 
 {% endfor %}

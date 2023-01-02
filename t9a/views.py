@@ -22,7 +22,8 @@ class HomeView(View):
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
         rankingP = Ranking(User)
-        results = Results.objects.filter(approved=True)
+        results = Results.objects.filter(approved__isnull=False)
+        print(results.count())
 
         for r in results:
             rankingL.add(r.list_id, r.result, r.score)
