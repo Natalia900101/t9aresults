@@ -10,17 +10,19 @@ from django.views import View
 from django.views.generic import ListView
 
 from . import forms
-from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm
+from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm
 from .helpers import Ranking
 from .models import Results, Lists, Games, Army
 
 
 class HomeView(View):
     def get(self, request):
+        to_be_approved = Results.objects.filter(Q(approved__isnull=True) & Q(player_id=self.request.user.id))
+
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
         rankingP = Ranking(User)
-        results = Results.objects.all()
+        results = Results.objects.filter(approved=True)
 
         for r in results:
             rankingL.add(r.list_id, r.result, r.score)
@@ -30,9 +32,48 @@ class HomeView(View):
             request,
             'home.html',
             context={
-                'rankings': [rankingP.get_list(), rankingA.get_list(), rankingL.get_list()]
+                'rankings': [rankingP.get_list(), rankingA.get_list(), rankingL.get_list()],
+                'to_be_approved': to_be_approved
             }
         )
+
+
+class ApproveResultView(LoginRequiredMixin, View):
+    def get(self, request, pk=0):
+        result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
+        if result:  # in form is displayed last  introduced value
+            list = result[0].list
+        else:
+            list = 0
+        result = Results.objects.get(id=pk)
+        initial = {
+            'list': list,
+            'approved': True
+        }
+        form = ApproveResultForm(initial=initial)
+        form.fields['list'].queryset = Lists.objects.filter(
+            owner_id=self.request.user.id)  # shows only my lists, modify options on the fly
+
+        return render(
+            request,
+            'approve-result.html',
+            context={
+                'form': form
+            }
+        )
+
+    def post(self, request, pk=0):
+        form = forms.ApproveResultForm(request.POST)
+        if form.is_valid():
+
+            check_list = Lists.objects.filter(Q(id=form.instance.list_id) & Q(owner_id=self.request.user.id)).count()
+            if check_list == 1:
+                result = Results.objects.get(id=pk)
+                result.approved = form.instance.approved
+                result.list_id = form.instance.list_id
+                result.comment = form.instance.comment
+                result.save()
+            return redirect('t9a:home')
 
 
 class ChangeUsernameView(LoginRequiredMixin, View):
@@ -162,6 +203,8 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         init_op_result = {
         }
         form_my_result = MyResultForm(initial=init_my_result, prefix='my')  # we used prefix to distinctions form
+        form_my_result.fields['list'].queryset = Lists.objects.filter(
+            owner_id=self.request.user.id)  # shows only my lists, modify options on the fly
         form_op_result = OpResultForm(initial=init_op_result, prefix='op')  # there are that same fields
         return render(
             request,
@@ -190,6 +233,7 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         score = form_my_result.instance.score
         form_my_result.instance.result = 1 if score > 10 else -1 if score < 10 else 0
         form_my_result.instance.game_id = form_game.instance.id
+        form_my_result.instance.approved = True
         fmr = form_my_result.save(commit=False)
         fmr.save()
 
@@ -249,7 +293,7 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
             list = Lists.objects.filter(Q(name__icontains=query)).values("id")
             army = Army.objects.filter(Q(name__icontains=query)).values("id")
             all_results = Results.objects.filter(
-                Q(player_id__in=player) | Q(list_id__in=list) # | Q(army_id__in=army)
+                Q(player_id__in=player) | Q(list_id__in=list)  # | Q(army_id__in=army)
             )
         duplicates = []
         for r in all_results:
@@ -257,7 +301,7 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
                 r = None
             else:
                 r.opponent = Results.objects.get(~Q(player_id=r.player_id)
-                                             & Q(game_id=r.game_id))
+                                                 & Q(game_id=r.game_id))
                 duplicates.append(r.game_id)
         return render(
             request,

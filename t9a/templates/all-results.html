@@ -29,7 +29,7 @@
       <th>Player</th>
     </tr>
     {% for result in all_results %}
-    {% if result.opponent %}
+    {% if result.opponent and result.opponent.list %}
     <tr>
       <td>{{result.game.event}}</td>
       <td>{{result.game.deploy.name}}</td>

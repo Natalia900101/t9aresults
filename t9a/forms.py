@@ -30,10 +30,16 @@ class MyResultForm(forms.ModelForm):
 class OpResultForm(forms.ModelForm):
     class Meta:
         model = Results
-        fields = ('player', 'points', 'list')
+        fields = ('player', 'points')
 
 
 class AddListForm(forms.ModelForm):
     class Meta:
         model = Lists
         fields = ('army', 'name', 'list')
+
+
+class ApproveResultForm(forms.ModelForm):
+    class Meta:
+        model = Results
+        fields = ('approved', 'list', 'comment')
