@@ -5,24 +5,49 @@
 {% endblock %}
 
 {% block container %}
-
+<form action=" " method="get">
+  <input name="q" type="text" placeholder="Search" value="{{query}}">
+  <button type="submit" class="btn btn-success btn-sm mb-sm-1">Search</button>
+</form></br>
 <div>
   <table class="table table-bordered">
     <tr>
-      <th> Player </th>
-      <th> Army </th>
-      <th> Score </th>
-      <th> Army </th>
-      <th> Player </th>
+      <th>Event</th>
+      <th>Deploy</th>
+      <th>Secondary Objective</th>
+      <th>Map</th>
+      <th>Player</th>
+      <th>Army</th>
+      <th>List</th>
+      <th>Secondary</th>
+      <th>Points</th>
+      <th>Score</th>
+      <th>Points</th>
+      <th>Secondary</th>
+      <th>List</th>
+      <th>Army</th>
+      <th>Player</th>
     </tr>
     {% for result in all_results %}
+    {% if result.opponent %}
     <tr>
-      <td class="{{ result.get_result_display }}">{{result.player}}</td>
-      <td> <a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{result.list.army}}</a></td>
-      <td> {{result.score}}:{{result.opponent.score}} </td>
-      <td> {{result.opponent.list}} {{result.opponent.list.army}} </td>
-      <td class="{{ result.opponent.get_result_display }}">{{result.opponent.player}}</td>
+      <td>{{result.game.event}}</td>
+      <td>{{result.game.deploy.name}}</td>
+      <td>{{result.game.secondary.name}}</td>
+      <td>{{result.game.map}}</td>
+      <td class="{{ result.get_result_display }}">{{result.player}}{{result.first|yesno:" F, "}}</td>
+      <td>{{result.list.army}}</td>
+      <td><a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{ result.list.name}}</a></td>
+      <td>{{result.get_secondary_display}}</td>
+      <td>{{result.points }}</td>
+      <td>{{result.score}}:{{result.opponent.score}}</td>
+      <td>{{result.opponent.points}}</td>
+      <td>{{result.opponent.get_secondary_display}}</td>
+      <td><a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{result.opponent.list.name}}</a></td>
+      <td>{{result.opponent.list.army}} </td>
+      <td class="{{ result.opponent.get_result_display }}">{{result.opponent.player}}{{result.opponent.first|yesno:" F, "}}</td>
     </tr>
+    {% endif %}
     {% endfor %}
   </table>
 </div>
