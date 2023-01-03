@@ -36,6 +36,7 @@ class Lists(models.Model):
     army = models.ForeignKey('Army', null=True, on_delete=models.SET_NULL)
     list = models.TextField()
     name = models.CharField(max_length=256)
+    uses_supplement = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['army', 'owner', 'name']

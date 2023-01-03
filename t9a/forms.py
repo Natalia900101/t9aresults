@@ -36,7 +36,7 @@ class OpResultForm(forms.ModelForm):
 class AddListForm(forms.ModelForm):
     class Meta:
         model = Lists
-        fields = ('army', 'name', 'list')
+        fields = ('army', 'name', 'uses_supplement', 'list')
 
 
 class ApproveResultForm(forms.ModelForm):

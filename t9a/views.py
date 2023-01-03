@@ -156,6 +156,7 @@ class AddListView(LoginRequiredMixin, View):
             form = AddListForm(instance=Lists.objects.get(id=pk))  # if list exist and list.id occurs in results
             if len(Results.objects.filter(list_id=pk)) > 0:  # field 'list' is read only in form
                 form.fields['list'].disabled = True
+                form.fields['army'].disabled = True
 
         return render(
             request,
@@ -173,6 +174,7 @@ class AddListView(LoginRequiredMixin, View):
                 if len(Results.objects.filter(list_id=list.id)) > 0:  # if list is connection with results,
                     POST = request.POST.copy()  # it's display and don't send in POST
                     POST['list'] = list.list  # we copy POST and overwrite value field 'list'
+                    POST['army'] = list.army
                     form = AddListForm(POST)
         if not form:
             form = AddListForm(request.POST)
