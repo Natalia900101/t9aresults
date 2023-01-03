@@ -5,11 +5,15 @@
 {% endblock %}
 
 {% block container %}
+<h2 class="text-center">My lists</h2>
+<a class="btn btn-primary" href="{% url 't9a:add-list' %}" role="button">Add list</a>
+<br>
+<br>
 <ol>
 {% for list in lists %}
 <li>
  <a href="{% url 't9a:add-list' pk=list.id %}">  {{list}}</a>
-  <pre>{{list.list}}<pre>
+  <pre>{{list.list}}</pre>
 </li>
   {% endfor%}
 </ol>
