@@ -14,8 +14,37 @@ Home
 <br>
 
 <div >
+    {% if waiting_for_approval %}
+    <h4 class="text-success">Opponent has to approve</h4>
+    <table class="table table-bordered border-success">
+        <tr>
+            <th></th>
+              <th>Event</th>
+              <th>Result</th>
+              <th>Secondary</th>
+              <th>Points</th>
+              <th>Score</th>
+              <th>Opponent</th>
+        </tr>
+         {% for result in waiting_for_approval %}
+        <tr>
+            <td><a class="btn btn-outline-success" href="{% url 't9a:approve-result' pk=result.id %}">Approve</a></td>
+            <td>{{result.game.event}}</td>
+            <td>{{result.myself.get_result_display}}</td>
+            <td>{{result.myself.get_secondary_display}}</td>
+            <td>{{result.myself.points}}</td>
+            <td>{{result.myself.score}} : {{result.score}}</td>
+            <td>{{result.player}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+
+
+<div >
     {% if to_be_approved   %}
-    <h4 class="text-danger">Result to approve</h4>
+    <h4 class="text-danger">I have to approve</h4>
     <table class="table table-bordered border-danger">
         <tr>
             <th></th>

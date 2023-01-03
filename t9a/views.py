@@ -17,9 +17,15 @@ from .models import Results, Lists, Games, Army
 class HomeView(View):
     def get(self, request):
         to_be_approved = Results.objects.filter(Q(approved__isnull=True) & Q(player_id=self.request.user.id))
+        my_results = Results.objects.filter(Q(player_id=self.request.user.id)).values('game_id')
+        waiting_for_approval = Results.objects.filter(Q(approved__isnull=True) & ~Q(player_id=self.request.user.id) & Q(game_id__in=my_results))
         for r in to_be_approved:
             r.opponent = Results.objects.get(~Q(player_id=r.player_id)
                                              & Q(game_id=r.game_id))
+        for r in waiting_for_approval:
+            r.myself = Results.objects.get(~Q(player_id=r.player_id)
+                                             & Q(game_id=r.game_id))
+
 
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
@@ -35,7 +41,8 @@ class HomeView(View):
             'home.html',
             context={
                 'rankings': [rankingP.get_list(), rankingA.get_list(), rankingL.get_list()],
-                'to_be_approved': to_be_approved
+                'to_be_approved': to_be_approved,
+                'waiting_for_approval': waiting_for_approval
             }
         )
 
@@ -69,8 +76,9 @@ class ApproveResultView(LoginRequiredMixin, View):
         if form.is_valid():
 
             check_list = Lists.objects.filter(Q(id=form.instance.list_id) & Q(owner_id=self.request.user.id)).count()
-            if check_list == 1:
-                result = Results.objects.get(id=pk)
+            result = Results.objects.get(id=pk)
+            print(check_list)
+            if check_list == 1 and result.player_id == self.request.user.id:
                 result.approved = form.instance.approved
                 result.list_id = form.instance.list_id
                 result.comment = form.instance.comment
