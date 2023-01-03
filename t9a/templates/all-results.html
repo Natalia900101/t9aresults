@@ -6,12 +6,18 @@
 
 {% block container %}
 <h2 class="text-center">All results</h2>
-<form action=" " method="get">
+<!--<form action=" " method="get">
   <input name="q" type="text" placeholder="Search" value="{{query}}">
   <button type="submit" class="btn btn-success btn-sm mb-sm-1">Search</button>
-</form></br>
+</form></br>-->
 <div>
-  <table class="table table-bordered">
+  <script>
+    $(document).ready(function () {
+    $('#result').DataTable();
+});
+  </script>
+  <table id="result" class="table table-bordered">
+    <thead>
     <tr>
       <th>Event</th>
       <th>Deploy</th>
@@ -29,6 +35,8 @@
       <th>Army</th>
       <th>Player</th>
     </tr>
+    </thead>
+    <tbody>
     {% for result in all_results %}
     {% if result.opponent and result.opponent.list %}
     <tr>
@@ -50,6 +58,7 @@
     </tr>
     {% endif %}
     {% endfor %}
+    </tbody>
   </table>
 </div>
 
