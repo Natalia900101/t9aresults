@@ -8,29 +8,41 @@ Home
 
 {%block container%}
 
-<h2> The 9th age results </h2>
+<h2 class="text-center"> The 9th age results </h2>
 {% if user.is_authenticated %}
 <h2>Hello {{user.username}}!</h2>
+<br>
 
-<div>
-    <table class="table table-bordered">
+<div >
+    {% if to_be_approved   %}
+    <h4 class="text-danger">Result to approve</h4>
+    <table class="table table-bordered border-danger">
         <tr>
-      <th> </th>
-      <th>Event</th>
-      <th>Player</th>
-      <th>Secondary</th>      
-      <th>Points</th>
-      <th>Score</th>
-    </tr>
+            <th></th>
+              <th>Event</th>
+              <th>Result</th>
+              <th>Secondary</th>
+              <th>Points</th>
+              <th>Score</th>
+              <th>Opponent</th>
+        </tr>
          {% for result in to_be_approved %}
         <tr>
-            <td><a href="{% url 't9a:approve-result' pk=result.id %}">{{result}}</a></td>
+            <td><a class="btn btn-outline-danger" href="{% url 't9a:approve-result' pk=result.id %}">Approve</a></td>
+            <td>{{result.game.event}}</td>
+            <td>{{result.get_result_display}}</td>
+            <td>{{result.get_secondary_display}}</td>
+            <td>{{result.points}}</td>
+            <td>{{result.score}}</td>
+            <td>{{result.opponent.player}}</td>
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
 </div>
 
 <div>
+    <h4>Ranking</h4>
   <table class="table table-bordered">
 {% for r in rankings%}
 

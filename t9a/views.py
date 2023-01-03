@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import ListView
 
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm
@@ -18,12 +17,14 @@ from .models import Results, Lists, Games, Army
 class HomeView(View):
     def get(self, request):
         to_be_approved = Results.objects.filter(Q(approved__isnull=True) & Q(player_id=self.request.user.id))
+        for r in to_be_approved:
+            r.opponent = Results.objects.get(~Q(player_id=r.player_id)
+                                             & Q(game_id=r.game_id))
 
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
         rankingP = Ranking(User)
         results = Results.objects.filter(approved__isnull=False)
-        print(results.count())
 
         for r in results:
             rankingL.add(r.list_id, r.result, r.score)
