@@ -49,7 +49,8 @@ class Games(models.Model):
         (0, 'test'),
         (1, 'grand'),
         (2, 'local'),
-        (3, 'friendly')
+        (3, 'league'),
+        (4, 'casual')
     ]
     date = models.DateField()
     map = models.ForeignKey('Map', null=True, on_delete=models.SET_NULL)

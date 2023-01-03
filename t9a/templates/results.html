@@ -26,9 +26,9 @@
     {% for result in results %}
     <tr>
       <td class="{{ result.get_result_display }}">{{result.player}}</td>
-      <td> <a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{result.list.army}}</a></td>
+      <td><a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{result.list.army}}</a></td>
       <td> {{result.score}}:{{result.opponent.score}} </td>
-      <td><a href="{% url 't9a:lists' pk=result.opponent.list.id %}" title="{{result.opponent.list}}">{{result.opponent.list.army}}</a></td>
+      <td>{{result.opponent.list.army}}</td>
       <td class="{{ result.opponent.get_result_display }}">{{result.opponent.player}}</td>
     </tr>
     {% endfor %}
