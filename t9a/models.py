@@ -45,12 +45,19 @@ class Lists(models.Model):
 
 
 class Games(models.Model):
+    event_list = [
+        (0, 'test'),
+        (1, 'grand'),
+        (2, 'local'),
+        (3, 'friendly')
+    ]
     date = models.DateField()
     map = models.ForeignKey('Map', null=True, on_delete=models.SET_NULL)
     deploy = models.ForeignKey('Deployments', null=True, on_delete=models.SET_NULL)
     secondary = models.ForeignKey('Secondaries', null=True, on_delete=models.SET_NULL)
     turns = models.IntegerField()
     event = models.CharField(max_length=256)
+    event_type = models.IntegerField(choices=event_list, default=0)
     points_event = models.IntegerField()
 
     def __str__(self):

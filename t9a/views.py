@@ -187,16 +187,19 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         if result:  # in form is displayed last  introduced value
             event = Games.objects.get(id=result[0].game_id).event
             points_event = Games.objects.get(id=result[0].game_id).points_event
+            event_type = Games.objects.get(id=result[0].game_id).event_type
             list = result[0].list
         else:
             event = ''
             points_event = 4500
             list = 0
+            event_type = 'test'
 
         init_game = {  # init value to game form
             'event': event,
             'points_event': points_event,
-            'date': datetime.now().strftime("%Y-%m-%d")
+            'date': datetime.now().strftime("%Y-%m-%d"),
+            'event_type': event_type
         }
         form_game = GameForm(initial=init_game)
         init_my_result = {  # init value to my result form
