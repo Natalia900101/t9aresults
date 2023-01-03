@@ -22,6 +22,7 @@ class GameForm(forms.ModelForm):
 
 
 class MyResultForm(forms.ModelForm):
+    first = forms.BooleanField(label="starting player")
     class Meta:
         model = Results
         fields = ('first', 'points', 'secondary', 'list', 'comment')
