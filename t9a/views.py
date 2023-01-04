@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 
 from django.contrib.auth import get_user_model, logout
@@ -5,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 
@@ -352,3 +354,31 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('t9a:home')
+
+
+class CSVView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        return redirect('t9a:home')
+
+    # Create the HttpResponse object with the appropriate CSV header.
+    def get(self, request):
+        filename = 'all-results-'+datetime.now().strftime('%Y-%m-%d')+'.csv'
+        response = HttpResponse(
+            content_type='text/csv',
+            headers={'Content-Disposition': f'attachment; filename="{filename}"'},
+        )
+
+        writer = csv.writer(response)
+        games = Games.objects.all()
+        writer.writerow(Games().csv_array_header()+Results().csv_array_header())
+        for g in games:
+            results = Results.objects.filter(Q(game_id=g.id) & Q(approved=True))
+            game_part = g.csv_array()
+            for r in results:
+                writer.writerow(game_part+r.csv_array())
+
+
+        return response

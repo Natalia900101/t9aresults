@@ -71,6 +71,32 @@ class Games(models.Model):
     def __str__(self):
         return f'{self.date}, {self.event}'
 
+    def csv_array_header(self):
+        return [
+            'game_id',
+            'date',
+            'map',
+            'deployment',
+            'secondary',
+            'turns',
+            'event_name',
+            'event_type',
+            'event_points',
+        ]
+
+    def csv_array(self):
+        return [
+            self.id,
+            self.date,
+            self.map.name,
+            self.deploy.name,
+            self.secondary.name,
+            self.turns,
+            self.event,
+            self.get_event_type_display(),
+            self.points_event
+        ]
+
 
 class Results(models.Model):
     choice_list = [
@@ -91,3 +117,29 @@ class Results(models.Model):
 
     def __str__(self):
         return f'{self.game.date}, {self.game.id}, {self.player}'
+
+    def csv_array_header(self):
+        return [
+            'player',
+            'result',
+            'score',
+            'secondary',
+            'points',
+            'starting_plyer',
+            'army',
+            'list',
+            'comment',
+        ]
+
+    def csv_array(self):
+        return [
+            self.player,
+            self.get_result_display(),
+            self.score,
+            self.get_secondary_display(),
+            self.points,
+            self.first,
+            self.list.army.name,
+            self.list.name,
+            self.comment
+        ]

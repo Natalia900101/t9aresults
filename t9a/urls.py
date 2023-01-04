@@ -18,6 +18,7 @@ urlpatterns = [
     path('logout', views.LogoutView.as_view(), name='logout'),
     path('approve/<int:pk>', views.ApproveResultView.as_view(), name='approve-result'),
     path('approve/', views.ApproveResultView.as_view(), name='approve-result'),
+    path('csv/', views.CSVView.as_view(), name='csv-all-results'),
 
 
 ]
