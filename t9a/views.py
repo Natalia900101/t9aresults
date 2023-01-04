@@ -240,6 +240,7 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         form_my_result.fields['list'].queryset = Lists.objects.filter(
             owner_id=self.request.user.id)  # shows only my lists, modify options on the fly
         form_op_result = OpResultForm(initial=init_op_result, prefix='op')  # there are that same fields
+        form_op_result.fields['player'].queryset = get_user_model().objects.filter(~Q(id=self.request.user.id))
         return render(
             request,
             'add-game.html',
