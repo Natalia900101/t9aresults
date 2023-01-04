@@ -11,22 +11,26 @@ from django.views import View
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm
 from .helpers import Ranking
-from .models import Results, Lists, Games, Army
+from .models import Results, Lists, Games, Army, UserRenamed
 
 
 class HomeView(View):
     def get(self, request):
+        if self.request.user.id:
+            if not UserRenamed.objects.filter(user_id=self.request.user.id).exists():
+                return redirect('t9a:my-account')
+
         head = '9th age results'
         to_be_approved = Results.objects.filter(Q(approved__isnull=True) & Q(player_id=self.request.user.id))
         my_results = Results.objects.filter(Q(player_id=self.request.user.id)).values('game_id')
-        waiting_for_approval = Results.objects.filter(Q(approved__isnull=True) & ~Q(player_id=self.request.user.id) & Q(game_id__in=my_results))
+        waiting_for_approval = Results.objects.filter(
+            Q(approved__isnull=True) & ~Q(player_id=self.request.user.id) & Q(game_id__in=my_results))
         for r in to_be_approved:
             r.opponent = Results.objects.get(~Q(player_id=r.player_id)
                                              & Q(game_id=r.game_id))
         for r in waiting_for_approval:
             r.myself = Results.objects.get(~Q(player_id=r.player_id)
-                                             & Q(game_id=r.game_id))
-
+                                           & Q(game_id=r.game_id))
 
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
@@ -111,9 +115,11 @@ class ChangeUsernameView(LoginRequiredMixin, View):
 
     def post(self, request):
         user = get_user_model().objects.get(id=self.request.user.id)
+        old_username = self.request.POST.get('username')
         username = self.request.POST.get('new_username')
         user.username = username
         user.save()
+        u_r = UserRenamed.objects.create(user_id=self.request.user.id, old_username=old_username, new_username=username)
 
         return redirect('t9a:home')
 

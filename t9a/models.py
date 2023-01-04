@@ -2,6 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class UserRenamed(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    old_username = models.CharField(max_length=128, null=True)
+    new_username = models.CharField(max_length=128, null=True)
+
+
 class Deployments(models.Model):
     name = models.CharField(max_length=256)
 
