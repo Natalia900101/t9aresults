@@ -16,6 +16,7 @@ from .models import Results, Lists, Games, Army
 
 class HomeView(View):
     def get(self, request):
+        head = '9th age results'
         to_be_approved = Results.objects.filter(Q(approved__isnull=True) & Q(player_id=self.request.user.id))
         my_results = Results.objects.filter(Q(player_id=self.request.user.id)).values('game_id')
         waiting_for_approval = Results.objects.filter(Q(approved__isnull=True) & ~Q(player_id=self.request.user.id) & Q(game_id__in=my_results))
@@ -42,13 +43,15 @@ class HomeView(View):
             context={
                 'rankings': [rankingP.get_list(), rankingA.get_list(), rankingL.get_list()],
                 'to_be_approved': to_be_approved,
-                'waiting_for_approval': waiting_for_approval
+                'waiting_for_approval': waiting_for_approval,
+                'head': head
             }
         )
 
 
 class ApproveResultView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
+        head = 'Approve result'
         result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
         if result:  # in form is displayed last  introduced value
             list = result[0].list
@@ -67,7 +70,8 @@ class ApproveResultView(LoginRequiredMixin, View):
             request,
             'approve-result.html',
             context={
-                'form': form
+                'form': form,
+                'head': head
             }
         )
 
@@ -88,6 +92,7 @@ class ApproveResultView(LoginRequiredMixin, View):
 
 class ChangeUsernameView(LoginRequiredMixin, View):
     def get(self, request):
+        head = 'My account'
         user = get_user_model().objects.get(id=self.request.user.id)
         username = user.username
         init = {
@@ -99,8 +104,8 @@ class ChangeUsernameView(LoginRequiredMixin, View):
             request,
             'my-account.html',
             context={
-                'form': form
-
+                'form': form,
+                'head': head
             }
         )
 
@@ -115,6 +120,7 @@ class ChangeUsernameView(LoginRequiredMixin, View):
 
 class ResultView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
+        head = 'My results'
         if pk == 0:
             my_result = Results.objects.filter(player_id=self.request.user.id)
         else:
@@ -126,14 +132,15 @@ class ResultView(LoginRequiredMixin, View):
             request,
             'results.html',
             context={
-                'results': my_result
-
+                'results': my_result,
+                'head': head
             }
         )
 
 
 class ListsView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
+        head = 'My lists'
         if pk == 0:
             lists = Lists.objects.filter(owner_id=self.request.user.id)
         else:
@@ -143,13 +150,15 @@ class ListsView(LoginRequiredMixin, View):
             request,
             'lists.html',
             context={
-                'lists': lists
+                'lists': lists,
+                'head': head
             }
         )
 
 
 class AddListView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
+        head = 'Add list'
         if pk == 0:  # if there's no list view add new list
             form = AddListForm()
         else:
@@ -162,7 +171,8 @@ class AddListView(LoginRequiredMixin, View):
             request,
             'add-list.html',
             context={
-                'form': form
+                'form': form,
+                'head': head
             }
         )
 
@@ -193,6 +203,7 @@ class AddListView(LoginRequiredMixin, View):
 
 class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
     def get(self, request):
+        head = 'Add game'
         result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
         if result:  # in form is displayed last  introduced value
             event = Games.objects.get(id=result[0].game_id).event
@@ -227,7 +238,8 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
             context={
                 'form_game': form_game,
                 'form_my_result': form_my_result,
-                'form_op_result': form_op_result
+                'form_op_result': form_op_result,
+                'head': head
             }
         )
 
@@ -299,6 +311,7 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
         return redirect('t9a:home')
 
     def get(self, request, pk=0):
+        head = 'All results'
         if self.request.GET.get("q") is None:
             all_results = Results.objects.all()
             query = ''
@@ -323,7 +336,8 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
             'all-results.html',
             context={
                 'all_results': all_results,
-                'query': query
+                'query': query,
+                'head': head
             }
         )
 
