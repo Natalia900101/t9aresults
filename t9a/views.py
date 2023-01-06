@@ -206,7 +206,7 @@ class AddListView(LoginRequiredMixin, View):
     def post(self, request, pk=0):
         form = {}
         if pk != 0:  # if list exist return that list
-            list = Lists.objects.get(id=pk)
+            list = Lists.objects.get(Q(id=pk) & Q(owner_id=self.request.user.id))
             if list:
                 if len(Results.objects.filter(list_id=list.id)) > 0:  # if list is connection with results,
                     POST = request.POST.copy()  # it's display and don't send in POST
@@ -218,7 +218,7 @@ class AddListView(LoginRequiredMixin, View):
         owner = self.request.user.id
         if form.is_valid():
             if pk != 0:
-                list = Lists.objects.get(id=pk)
+                list = Lists.objects.get(Q(id=pk) & Q(owner_id=self.request.user.id))
                 if list:
                     form.instance.id = list.id
                     if len(Results.objects.filter(list_id=list.id)) > 0:

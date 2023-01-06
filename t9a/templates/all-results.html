@@ -21,6 +21,7 @@
     <thead>
     <tr>
       <th>Event</th>
+      <th>Event Type</th>
       <th>Deploy</th>
       <th>Secondary Objective</th>
       <th>Map</th>
@@ -42,6 +43,7 @@
     {% if result.opponent and result.opponent.list %}
     <tr>
       <td>{{result.game.event}}</td>
+      <td>{{result.game.get_event_type_display}}</td>
       <td>{{result.game.deploy.name}}</td>
       <td>{{result.game.secondary.name}}</td>
       <td>{{result.game.map}}</td>
@@ -53,7 +55,7 @@
       <td>{{result.score}}:{{result.opponent.score}}</td>
       <td>{{result.opponent.points}}</td>
       <td>{{result.opponent.get_secondary_display}}</td>
-      <td><a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{result.opponent.list.name}}</a></td>
+      <td><a href="{% url 't9a:lists' pk=result.opponent.list.id %}" title="{{result.opponent.list}}">{{result.opponent.list.name}}</a></td>
       <td>{{result.opponent.list.army}} </td>
       <td class="{{ result.opponent.get_result_display }}">{{result.opponent.player}}{{result.opponent.first|yesno:" F, "}}</td>
     </tr>
