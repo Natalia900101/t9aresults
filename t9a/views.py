@@ -50,14 +50,20 @@ class HomeView(View):
                 'rankings': [
                     {
                         'name': "Players",
+                        'id': "table-players",
+                        'sortable': True,
                         'ranking': rankingP.get_list(),
                     },
                     {
                         'name': "Armies",
+                        'id': "table-armies",
+                        'sortable': True,
                         'ranking': rankingA.get_list(),
                     },
                     {
                         'name': "Lists",
+                        'id': "table-lists",
+                        'sortable': True,
                         'ranking': rankingL.get_list(),
                     }
                 ],
@@ -399,12 +405,14 @@ class CSVView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class AddGamingGroup(LoginRequiredMixin, View):
     def get(self, request):
+        head = 'Add group'
         form = forms.AddGamingGroupForm
         return render(
             request,
             'add-gaming-group.html',
             context={
-                'form': form
+                'form': form,
+                'head': head
             }
         )
 
@@ -418,6 +426,7 @@ class AddGamingGroup(LoginRequiredMixin, View):
 
 class GamingGroupListView(LoginRequiredMixin, View):
     def get(self, request):
+        head = 'List groups'
         groups = GamingGroup.objects.all()
         for g in groups:
             g.flat_members = list(g.members.values_list('username', flat=True))
@@ -427,7 +436,8 @@ class GamingGroupListView(LoginRequiredMixin, View):
             request,
             'list-groups.html',
             context={
-                'groups': groups
+                'groups': groups,
+                'head': head
             }
 
         )

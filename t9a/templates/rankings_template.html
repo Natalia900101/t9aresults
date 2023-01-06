@@ -2,8 +2,16 @@
     <h4>Rankings</h4>
 
 {% for r in rankings%}
+    {% if r.sortable%}
+      <script>
+          $(document).ready(function () {
+            $('#{{r.id}}').DataTable();
+          });
+  </script>
+    {% endif %}
     {{r.name}}
-<table class="table table-bordered">
+<table id="{{r.id}}" class="table table-bordered" data-order='[[ 2, "desc"]][[ 3, "desc"]][[ 4, "desc"]]'>
+    <thead>
     <tr>
       <th style="width: 35%"> </th>
       <th class="win">w</th>
@@ -13,6 +21,8 @@
       <th>Total score</th>
       <th>Avg. score</th>
     </tr>
+    </thead>
+    <tbody>
     {% for result in r.ranking %}
     <tr>
       <td class="">{{result.object}}</td>
@@ -24,6 +34,7 @@
       <td>{{result.avg | floatformat:2 }}</td>
     </tr>
     {% endfor %}
+    </tbody>
   </table>
 {% endfor %}
 </div>
