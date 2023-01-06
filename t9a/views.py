@@ -47,7 +47,20 @@ class HomeView(View):
             request,
             'home.html',
             context={
-                'rankings': [rankingP.get_list(), rankingA.get_list(), rankingL.get_list()],
+                'rankings': [
+                    {
+                        'name': "Players",
+                        'ranking': rankingP.get_list(),
+                    },
+                    {
+                        'name': "Armies",
+                        'ranking': rankingA.get_list(),
+                    },
+                    {
+                        'name': "Lists",
+                        'ranking': rankingL.get_list(),
+                    }
+                ],
                 'to_be_approved': to_be_approved,
                 'waiting_for_approval': waiting_for_approval,
                 'head': head

@@ -44,6 +44,7 @@ Home
     {% if to_be_approved   %}
     <h4 class="text-danger">I have to approve</h4>
     <table class="table table-bordered border-danger">
+        <thead>
         <tr>
             <th></th>
               <th>Event</th>
@@ -53,6 +54,8 @@ Home
               <th>Score</th>
               <th>Opponent</th>
         </tr>
+        </thead>
+        <tbody>
          {% for result in to_be_approved %}
         <tr>
             <td><a class="btn btn-outline-danger" href="{% url 't9a:approve-result' pk=result.id %}">Approve</a></td>
@@ -64,39 +67,13 @@ Home
             <td>{{result.opponent.player}}</td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
     {% endif %}
 </div>
 
-<div>
-    <h4>Ranking</h4>
-  <table class="table table-bordered">
-{% for r in rankings%}
+{% include 'rankings_template.html' %}
 
-    <tr>
-      <th> </th>
-      <th class="win">w</th>
-      <th class="draw">d</th>
-      <th class="loose">l</th>
-      <th> Games </th>
-      <th>Total score</th>
-      <th>Avg. score</th>
-    </tr>
-    {% for result in r %}
-    <tr>
-      <td class="">{{result.object}}</td>
-      <td class="win">{{result.win}}</td>
-      <td class="draw">{{result.draw}}</td>
-      <td class="loose">{{result.loose}}</td>
-      <td class="">{{result.games}}</td>
-      <td>{{result.sum}}</td>
-      <td>{{result.avg | floatformat:2 }}</td>
-    </tr>
-    {% endfor %}
-
-{% endfor %}
-  </table>
-</div>
 {% endif %}
 
 

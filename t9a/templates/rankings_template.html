@@ -1,0 +1,29 @@
+<div>
+    <h4>Rankings</h4>
+
+{% for r in rankings%}
+    {{r.name}}
+<table class="table table-bordered">
+    <tr>
+      <th style="width: 35%"> </th>
+      <th class="win">w</th>
+      <th class="draw">d</th>
+      <th class="loose">l</th>
+      <th> Games </th>
+      <th>Total score</th>
+      <th>Avg. score</th>
+    </tr>
+    {% for result in r.ranking %}
+    <tr>
+      <td class="">{{result.object}}</td>
+      <td class="win">{{result.win}}</td>
+      <td class="draw">{{result.draw}}</td>
+      <td class="loose">{{result.loose}}</td>
+      <td class="">{{result.games}}</td>
+      <td>{{result.sum}}</td>
+      <td>{{result.avg | floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endfor %}
+</div>
