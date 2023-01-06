@@ -9,4 +9,4 @@ admin.site.register(models.Deployments)
 admin.site.register(models.Map)
 admin.site.register(models.Secondaries)
 admin.site.register(models.UserRenamed)
-
+admin.site.register(models.GamingGroup)

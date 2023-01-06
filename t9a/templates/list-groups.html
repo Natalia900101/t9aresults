@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Gaming Group
+{% endblock %}
+
+{% block container %}
+<a class="btn btn-primary" href="{% url 't9a:add-group' %}" role="button">Add group</a>
+<br>
+<br>
+<ol>
+{% for group in groups %}
+<li>
+    {{group.name}}, {% for m in group.flat_members %} {{m}} {% endfor %}
+
+</li>
+  {% endfor%}
+</ol>
+{% endblock %}

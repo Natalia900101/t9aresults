@@ -143,3 +143,12 @@ class Results(models.Model):
             self.list.name,
             self.comment
         ]
+
+
+class GamingGroup(models.Model):
+    name = models.CharField(max_length=256)
+    comment = models.TextField()
+    members = models.ManyToManyField(User, null=True)
+
+    def __str__(self):
+        return self.name

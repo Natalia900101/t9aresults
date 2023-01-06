@@ -13,7 +13,7 @@ from django.views import View
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm
 from .helpers import Ranking
-from .models import Results, Lists, Games, Army, UserRenamed
+from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup
 
 
 class HomeView(View):
@@ -366,7 +366,7 @@ class CSVView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     # Create the HttpResponse object with the appropriate CSV header.
     def get(self, request):
-        filename = 'all-results-'+datetime.now().strftime('%Y-%m-%d')+'.csv'
+        filename = 'all-results-' + datetime.now().strftime('%Y-%m-%d') + '.csv'
         response = HttpResponse(
             content_type='text/csv',
             headers={'Content-Disposition': f'attachment; filename="{filename}"'},
@@ -374,12 +374,46 @@ class CSVView(LoginRequiredMixin, UserPassesTestMixin, View):
 
         writer = csv.writer(response)
         games = Games.objects.all()
-        writer.writerow(Games().csv_array_header()+Results().csv_array_header())
+        writer.writerow(Games().csv_array_header() + Results().csv_array_header())
         for g in games:
             results = Results.objects.filter(Q(game_id=g.id) & Q(approved=True))
             game_part = g.csv_array()
             for r in results:
-                writer.writerow(game_part+r.csv_array())
-
+                writer.writerow(game_part + r.csv_array())
 
         return response
+
+
+class AddGamingGroup(LoginRequiredMixin, View):
+    def get(self, request):
+        form = forms.AddGamingGroupForm
+        return render(
+            request,
+            'add-gaming-group.html',
+            context={
+                'form': form
+            }
+        )
+
+    def post(self, request):
+        form = forms.AddGamingGroupForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+        return redirect('t9a:list-groups')
+
+
+class GamingGroupListView(LoginRequiredMixin, View):
+    def get(self, request):
+        groups = GamingGroup.objects.all()
+        for g in groups:
+            g.flat_members = g.members.values_list('username', flat=True)
+
+        return render(
+            request,
+            'list-groups.html',
+            context={
+                'groups': groups
+            }
+
+        )

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from t9a.models import Games, Results, Lists
+from t9a.models import Games, Results, Lists, GamingGroup
 
 
 class UsernameForm(forms.ModelForm):
@@ -22,7 +22,8 @@ class GameForm(forms.ModelForm):
 
 
 class MyResultForm(forms.ModelForm):
-    first = forms.BooleanField(label="starting player",required=False)
+    first = forms.BooleanField(label="starting player", required=False)
+
     class Meta:
         model = Results
         fields = ('first', 'points', 'secondary', 'list', 'comment')
@@ -44,3 +45,9 @@ class ApproveResultForm(forms.ModelForm):
     class Meta:
         model = Results
         fields = ('approved', 'list', 'comment')
+
+
+class AddGamingGroupForm(forms.ModelForm):
+    class Meta:
+        model = GamingGroup
+        fields = ('name', 'comment')

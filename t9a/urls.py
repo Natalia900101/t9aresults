@@ -19,6 +19,10 @@ urlpatterns = [
     path('approve/<int:pk>', views.ApproveResultView.as_view(), name='approve-result'),
     path('approve/', views.ApproveResultView.as_view(), name='approve-result'),
     path('csv/', views.CSVView.as_view(), name='csv-all-results'),
+    path('add-group/', views.AddGamingGroup.as_view(), name='add-group'),
+    path('list-groups/', views.GamingGroupListView.as_view(), name='list-groups'),
+    
+
 
 
 ]
