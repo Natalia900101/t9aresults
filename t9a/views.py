@@ -407,7 +407,8 @@ class GamingGroupListView(LoginRequiredMixin, View):
     def get(self, request):
         groups = GamingGroup.objects.all()
         for g in groups:
-            g.flat_members = g.members.values_list('username', flat=True)
+            g.flat_members = list(g.members.values_list('username', flat=True))
+            g.iamin = self.request.user.username in g.flat_members
 
         return render(
             request,
@@ -417,3 +418,30 @@ class GamingGroupListView(LoginRequiredMixin, View):
             }
 
         )
+
+
+class JoinGroupView(LoginRequiredMixin, View):
+
+    def get(self, request, pk):
+        group = GamingGroup.objects.get(id=pk)
+        member = get_user_model().objects.get(id=self.request.user.id)
+        group.members.add(member)
+
+        return redirect('t9a:list-groups')
+
+    def post(self, request, pk):
+        return self.get(request, pk)
+
+
+class LeaveGroupView(LoginRequiredMixin, View):
+
+    def get(self, request, pk):
+        group = GamingGroup.objects.get(id=pk)
+        member = get_user_model().objects.get(id=self.request.user.id)
+        group.members.remove(member)
+
+        return redirect('t9a:list-groups')
+
+    def post(self, request, pk):
+        return self.get(request, pk)
+

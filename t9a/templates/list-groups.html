@@ -7,13 +7,39 @@
 {% block container %}
 <a class="btn btn-primary" href="{% url 't9a:add-group' %}" role="button">Add group</a>
 <br>
-<br>
-<ol>
-{% for group in groups %}
-<li>
-    {{group.name}}, {% for m in group.flat_members %} {{m}} {% endfor %}
+<div>
+  <script>
+    $(document).ready(function () {
+    $('#groups').DataTable();
+});
+  </script>
+  <table id="groups" class="table table-bordered">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>Name</th>
+      <td>Description</td>
+      <th>Members</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+      <tbody>
+    {% for group in groups %}
+    <tr>
+      <td>{{group.id}}</td>
+    <td>{{group.name}}</td>
+      <td>{{group.comment}}</td>
+        <td>{{group.flat_members | join:", "}}</td>
+        <td>
+          {% if group.iamin %}
+          <a class="btn btn-danger btn-sm" type="submit" href="{% url 't9a:leave-group' pk=group.id %}">Leave group</a>
+          {% else %}
+          <a class="btn btn-success btn-sm" type="submit" href="{% url 't9a:join-group' pk=group.id %}">Join group</a>
+          {% endif %}
+        </td>
 
-</li>
+    </tr>
   {% endfor%}
-</ol>
+</tbody>
+  </table>
 {% endblock %}

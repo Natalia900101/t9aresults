@@ -21,6 +21,10 @@ urlpatterns = [
     path('csv/', views.CSVView.as_view(), name='csv-all-results'),
     path('add-group/', views.AddGamingGroup.as_view(), name='add-group'),
     path('list-groups/', views.GamingGroupListView.as_view(), name='list-groups'),
+    path('join-group/<int:pk>', views.JoinGroupView.as_view(), name='join-group'),
+    path('leave-group/<int:pk>', views.LeaveGroupView.as_view(), name='leave-group'),
+
+    
     
 
 
