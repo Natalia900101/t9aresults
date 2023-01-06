@@ -468,3 +468,52 @@ class LeaveGroupView(LoginRequiredMixin, View):
     def post(self, request, pk):
         return self.get(request, pk)
 
+
+class GroupRankingView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        group = GamingGroup.objects.get(id=pk)
+        head = f'Rankings for {group}'
+        members = group.members.values_list('id', flat=True)
+        results = Results.objects.filter(Q(player_id__in=members) & Q(approved=True))
+
+        rankingI = Ranking(User)
+        rankingE = Ranking(User)
+        rankingA = Ranking(User)
+
+        for r in results:
+            is_opponent_in_group = Results.objects.filter(
+                ~Q(player_id=r.player_id) & Q(player_id__in=members) & Q(game_id=r.game_id)
+            ).count()
+            rankingA.add(r.player_id, r.result, r.score)
+            if is_opponent_in_group == 0:
+                rankingE.add(r.player_id, r.result, r.score)
+            else:
+                rankingI.add(r.player_id, r.result, r.score)
+
+        return render(
+            request,
+            'group-ranking.html',
+            context={
+                'rankings': [
+                    {
+                        'name': "Internal",
+                        'id': "table-internal",
+                        'sortable': True,
+                        'ranking': rankingI.get_list(),
+                    },
+                    {
+                        'name': "External",
+                        'id': "table-external",
+                        'sortable': True,
+                        'ranking': rankingE.get_list(),
+                    },
+                    {
+                        'name': "All",
+                        'id': "table-all",
+                        'sortable': True,
+                        'ranking': rankingA.get_list(),
+                    },
+            ],
+                'head': head,
+            }
+        )

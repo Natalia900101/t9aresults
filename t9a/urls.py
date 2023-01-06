@@ -23,10 +23,7 @@ urlpatterns = [
     path('list-groups/', views.GamingGroupListView.as_view(), name='list-groups'),
     path('join-group/<int:pk>', views.JoinGroupView.as_view(), name='join-group'),
     path('leave-group/<int:pk>', views.LeaveGroupView.as_view(), name='leave-group'),
-
-    
-    
-
+    path('group-ranking/<int:pk>', views.GroupRankingView.as_view(), name='group-ranking'),
 
 
 ]

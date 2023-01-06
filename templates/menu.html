@@ -18,6 +18,9 @@
         <li class="nav-item">
           <a class="nav-link" href="#">Welcome, You are logged in as {{ user.username }}</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 't9a:add-game' %}"><b>Add game</b></a>
+        </li>
          <li class="nav-item">
           <a class="nav-link" href="{% url 't9a:results' %}">Results</a>
         </li>
@@ -27,13 +30,11 @@
          <li class="nav-item">
           <a class="nav-link" href="{% url 't9a:my-account' %}">My account</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 't9a:add-game' %}">Add game</a>
-        </li>
-
+        <!--
         <li class="nav-item">
           <a class="nav-link" href="{% url 't9a:add-list' %}">Add list</a>
         </li>
+        -->
          <li class="nav-item">
           <a class="nav-link" href="{% url 't9a:list-groups' %}">List groups</a>
         </li>
