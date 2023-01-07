@@ -355,6 +355,11 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request, pk=0):
         head = 'All results'
+
+        waiting_for_approval = Results.objects.filter(Q(approved__isnull=True))
+        for r in waiting_for_approval:
+            r.myself = Results.objects.get(~Q(player_id=r.player_id) & Q(game_id=r.game_id))
+
         if self.request.GET.get("q") is None:
             all_results = Results.objects.all()
             query = ''
@@ -380,7 +385,8 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
             context={
                 'results': all_results,
                 'query': query,
-                'head': head
+                'head': head,
+                'waiting_for_approval': waiting_for_approval,
             }
         )
 

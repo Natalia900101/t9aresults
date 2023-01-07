@@ -11,6 +11,35 @@
 </form></br>-->
 <a class="btn btn-info" href="{% url 't9a:csv-all-results' %}" role="button" style="margin-bottom: 10px">Download CSV</a>
 <br>
+
+<div >
+    {% if waiting_for_approval %}
+    <h4 class="text-primary">Player has to approve</h4>
+    <table class="table table-bordered border-primary">
+        <tr>
+            <th>Player</th>
+              <th>Event</th>
+              <th>Result</th>
+              <th>Secondary</th>
+              <th>Points</th>
+              <th>Score</th>
+              <th>Opponent</th>
+        </tr>
+        {% for result in waiting_for_approval %}
+       <tr>
+            <td><a class="btn btn-outline-primary" href="{% url 't9a:approve-result' pk=result.id %}">Approve</a> {{result.player}}</td>
+            <td>{{result.game.event}}</td>
+            <td>{{result.get_result_display}}</td>
+            <td>{{result.get_secondary_display}}</td>
+            <td>{{result.points}}</td>
+            <td>{{result.score}} : {{result.myself.score}}</td>
+            <td>{{result.myself.player}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+
 {% include 'result_template.html' %}
 
 {% endblock %}
