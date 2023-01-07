@@ -11,7 +11,8 @@
 <ol>
 {% for list in lists %}
 <li>
- <a href="{% url 't9a:add-list' pk=list.id %}">  {{list}}</a>
+ <a href="{% url 't9a:add-list' pk=list.id %}">{{list}}</a><br/>
+    {% if list.uses_supplement %}uses supplement{% endif %}
   <pre>{{list.list}}</pre>
 </li>
   {% endfor%}

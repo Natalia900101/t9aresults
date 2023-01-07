@@ -167,11 +167,25 @@ class ResultView(LoginRequiredMixin, View):
 
 class ListsView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
-        head = 'My lists'
+        if pk == 0:
+            head = 'My lists'
+        else:
+            head = 'List details'
+        my_list = Lists.objects.filter(Q(owner_id=self.request.user.id) & Q(id=pk))
         if pk == 0:
             lists = Lists.objects.filter(owner_id=self.request.user.id)
-        else:
+        elif my_list:
+            lists = my_list
+        elif self.request.user.is_superuser:
             lists = Lists.objects.filter(id=pk)
+        else:
+            # if pk exists in approved result in game I played
+            my_games = Results.objects.filter(Q(player_id=self.request.user.id) & Q(approved=True)).values_list('game_id', flat=True)
+            list_games = Results.objects.filter(Q(list_id=pk) & Q(approved=True)).values_list('game_id', flat=True)
+            if set(my_games) & set(list_games):
+                lists = Lists.objects.filter(id=pk)
+            else:
+                lists = []
 
         return render(
             request,
@@ -185,11 +199,12 @@ class ListsView(LoginRequiredMixin, View):
 
 class AddListView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
-        head = 'Add list'
         if pk == 0:  # if there's no list view add new list
+            head = 'Add list'
             form = AddListForm()
         else:
-            form = AddListForm(instance=Lists.objects.get(id=pk))  # if list exist and list.id occurs in results
+            head = 'Edit list'
+            form = AddListForm(instance=Lists.objects.get(Q(id=pk) & Q(owner_id=self.request.user.id)))  # if list exist and list.id occurs in results
             if len(Results.objects.filter(list_id=pk)) > 0:  # field 'list' is read only in form
                 form.fields['list'].disabled = True
                 form.fields['army'].disabled = True
