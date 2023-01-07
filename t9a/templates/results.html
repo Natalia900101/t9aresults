@@ -5,34 +5,6 @@
 {% endblock %}
 
 {% block container %}
-<div>
-  <script>
-    $(document).ready(function () {
-    $('#result').DataTable();
-});
-  </script>
-  <table id="result" class="table table-bordered">
-    <thead>
-    <tr>
-      <th> Player 1</th>
-      <th> Army 1</th>
-      <th> Score </th>
-      <th> Army 2</th>
-      <th> Player 2</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for result in results %}
-    <tr>
-      <td class="{{ result.get_result_display }}">{{result.player}}</td>
-      <td><a title="{{result.list}}">{{result.list.army}}</a></td>
-      <td> {{result.score}}:{{result.opponent.score}} </td>
-      <td><a title="{{result.opponent.list}}">{{result.opponent.list.army}}</a></td>
-      <td class="{{ result.opponent.get_result_display }}">{{result.opponent.player}}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</div>
+{% include 'result_template.html' %}
 
 {% endblock %}

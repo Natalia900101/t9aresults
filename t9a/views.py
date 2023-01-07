@@ -363,7 +363,7 @@ class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
             request,
             'all-results.html',
             context={
-                'all_results': all_results,
+                'results': all_results,
                 'query': query,
                 'head': head
             }

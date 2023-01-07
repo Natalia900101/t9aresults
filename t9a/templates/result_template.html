@@ -1,0 +1,59 @@
+<div>
+  <script>
+    $(document).ready(function () {
+    $('#result').DataTable();
+});
+  </script>
+  <table id="result" class="table table-bordered">
+    <thead>
+    <tr>
+      <th>No.</th>
+      <th>Date</th>
+      <th>Event</th>
+      <th>Event Type</th>
+      <th>Deploy</th>
+      <th>Secondary Objective</th>
+      <th>Map</th>
+      <th>Player</th>
+      <th>Army</th>
+      <th>List</th>
+      <th>Secondary</th>
+      <th>Points</th>
+      <th>Score</th>
+      <th>Points</th>
+      <th>Secondary</th>
+      <th>List</th>
+      <th>Army</th>
+      <th>Player</th>
+      <th>No.</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for result in results %}
+    {% if result.opponent and result.opponent.list %}
+    <tr>
+      <td>{{result.game.id}}</td>
+      <td>{{result.game.date|date:"Y-m-d"}}</td>
+      <td>{{result.game.event}}</td>
+      <td>{{result.game.get_event_type_display}}</td>
+      <td>{{result.game.deploy.name}}</td>
+      <td>{{result.game.secondary.name}}</td>
+      <td>{{result.game.map}}</td>
+      <td class="{{ result.get_result_display }}">{{result.player}}{{result.first|yesno:" F, "}}</td>
+      <td>{{result.list.army}}</td>
+      <td><a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{ result.list.name}}</a></td>
+      <td>{{result.get_secondary_display}}</td>
+      <td>{{result.points }}</td>
+      <td>{{result.score}}:{{result.opponent.score}}</td>
+      <td>{{result.opponent.points}}</td>
+      <td>{{result.opponent.get_secondary_display}}</td>
+      <td><a href="{% url 't9a:lists' pk=result.opponent.list.id %}" title="{{result.opponent.list}}">{{result.opponent.list.name}}</a></td>
+      <td>{{result.opponent.list.army}} </td>
+      <td class="{{ result.opponent.get_result_display }}">{{result.opponent.player}}{{result.opponent.first|yesno:" F, "}}</td>
+      <td>{{result.game.id}}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
