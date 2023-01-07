@@ -7,6 +7,9 @@ class UserRenamed(models.Model):
     old_username = models.CharField(max_length=128, null=True)
     new_username = models.CharField(max_length=128, null=True)
 
+    def __str__(self):
+        return f'{self.old_username} -> {self.new_username}'
+
 
 class Deployments(models.Model):
     name = models.CharField(max_length=256)

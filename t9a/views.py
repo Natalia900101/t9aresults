@@ -18,9 +18,10 @@ from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup
 
 class HomeView(View):
     def get(self, request):
+        renamed = True
         if self.request.user.id:
             if not UserRenamed.objects.filter(user_id=self.request.user.id).exists():
-                return redirect('t9a:my-account')
+                renamed = False
 
         head = '9th age results'
         to_be_approved = Results.objects.filter(Q(approved__isnull=True) & Q(player_id=self.request.user.id))
@@ -69,7 +70,8 @@ class HomeView(View):
                 ],
                 'to_be_approved': to_be_approved,
                 'waiting_for_approval': waiting_for_approval,
-                'head': head
+                'head': head,
+                'user_renamed': renamed
             }
         )
 
@@ -116,7 +118,12 @@ class ApproveResultView(LoginRequiredMixin, View):
 
 
 class ChangeUsernameView(LoginRequiredMixin, View):
-    def get(self, request):
+    def get(self, request, opt="nothing"):
+        if opt == "disregard":
+            u_r = UserRenamed.objects.create(user_id=self.request.user.id, old_username=self.request.user.username,
+                                             new_username=self.request.user.username)
+            return redirect('t9a:home')
+
         head = 'My account'
         user = get_user_model().objects.get(id=self.request.user.id)
         username = user.username

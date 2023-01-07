@@ -9,6 +9,11 @@ Home
 {%block container%}
 {% if user.is_authenticated %}
 <h2>Hello {{user.username}}!</h2>
+{% if not user_renamed %}
+<br/>
+First login? You can <a class="btn btn-outline-success" href="{% url 't9a:my-account' %}">rename</a> your user or <a class="btn btn-outline-danger" href="{% url 't9a:my-account' opt='disregard' %}">disregard</a> this message.
+<br/>
+{% endif %}
 <br>
 
 <div >
