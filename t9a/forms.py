@@ -23,6 +23,7 @@ class GameForm(forms.ModelForm):
 
 class MyResultForm(forms.ModelForm):
     first = forms.BooleanField(label="starting player", required=False)
+    points = forms.IntegerField(label="Small points (VP auto-calculated)", required=True)
 
     class Meta:
         model = Results
@@ -30,6 +31,7 @@ class MyResultForm(forms.ModelForm):
 
 
 class OpResultForm(forms.ModelForm):
+    points = forms.IntegerField(label="Small points (VP auto-calculated)", required=True)
     class Meta:
         model = Results
         fields = ('player', 'points')
