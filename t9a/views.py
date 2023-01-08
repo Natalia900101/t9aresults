@@ -1,6 +1,7 @@
 import csv
 from datetime import datetime
 
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
@@ -20,7 +21,8 @@ class HomeView(View):
     def get(self, request):
         renamed = True
         if self.request.user.id:
-            if not UserRenamed.objects.filter(user_id=self.request.user.id).exists():
+            if not UserRenamed.objects.filter(user_id=self.request.user.id).exists() \
+                    and SocialAccount.objects.filter(user_id=self.request.user.id).exists():
                 renamed = False
 
         head = '9th age results'
@@ -187,7 +189,8 @@ class ListsView(LoginRequiredMixin, View):
             lists = Lists.objects.filter(id=pk)
         else:
             # if pk exists in approved result in game I played
-            my_games = Results.objects.filter(Q(player_id=self.request.user.id) & Q(approved=True)).values_list('game_id', flat=True)
+            my_games = Results.objects.filter(Q(player_id=self.request.user.id) & Q(approved=True)).values_list(
+                'game_id', flat=True)
             list_games = Results.objects.filter(Q(list_id=pk) & Q(approved=True)).values_list('game_id', flat=True)
             if set(my_games) & set(list_games):
                 lists = Lists.objects.filter(id=pk)
@@ -211,7 +214,8 @@ class AddListView(LoginRequiredMixin, View):
             form = AddListForm()
         else:
             head = 'Edit list'
-            form = AddListForm(instance=Lists.objects.get(Q(id=pk) & Q(owner_id=self.request.user.id)))  # if list exist and list.id occurs in results
+            form = AddListForm(instance=Lists.objects.get(
+                Q(id=pk) & Q(owner_id=self.request.user.id)))  # if list exist and list.id occurs in results
             if len(Results.objects.filter(list_id=pk)) > 0:  # field 'list' is read only in form
                 form.fields['list'].disabled = True
                 form.fields['army'].disabled = True
@@ -281,7 +285,8 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         form_my_result.fields['list'].queryset = Lists.objects.filter(
             owner_id=self.request.user.id)  # shows only my lists, modify options on the fly
         form_op_result = OpResultForm(initial=init_op_result, prefix='op')  # there are that same fields
-        form_op_result.fields['player'].queryset = get_user_model().objects.filter(~Q(id=self.request.user.id)).order_by('username')
+        form_op_result.fields['player'].queryset = get_user_model().objects.filter(
+            ~Q(id=self.request.user.id)).order_by('username')
         return render(
             request,
             'add-game.html',
@@ -541,7 +546,7 @@ class GroupRankingView(LoginRequiredMixin, View):
                         'sortable': True,
                         'ranking': rankingA.get_list(),
                     },
-            ],
+                ],
                 'head': head,
             }
         )
