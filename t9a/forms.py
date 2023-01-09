@@ -18,7 +18,7 @@ class GameForm(forms.ModelForm):
 
     class Meta:
         model = Games
-        fields = '__all__'
+        fields = ('date', 'map', 'deploy', 'secondary', 'turns', 'event', 'event_type', 'points_event')
 
 
 class MyResultForm(forms.ModelForm):
