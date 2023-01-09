@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class UserRenamed(models.Model):
@@ -46,6 +47,7 @@ class Lists(models.Model):
     list = models.TextField()
     name = models.CharField(max_length=256)
     uses_supplement = models.BooleanField(default=False)
+    data_save = models.DateField(default=timezone.now)
 
     class Meta:
         ordering = ['army', 'owner', 'name']
@@ -70,6 +72,7 @@ class Games(models.Model):
     event = models.CharField(max_length=256)
     event_type = models.IntegerField(choices=event_list, default=0)
     points_event = models.IntegerField()
+    save_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f'{self.date}, {self.event}'
@@ -117,6 +120,7 @@ class Results(models.Model):
     points = models.IntegerField()
     approved = models.BooleanField(null=True)
     first = models.BooleanField()
+    data_save = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f'{self.game.date}, {self.game.id}, {self.player}'
