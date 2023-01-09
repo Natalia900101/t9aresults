@@ -1,5 +1,8 @@
+import re
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.utils import timezone
 
 
@@ -121,6 +124,28 @@ class Results(models.Model):
     approved = models.BooleanField(null=True)
     first = models.BooleanField()
     data_save = models.DateTimeField(default=timezone.now)
+
+    def auto_approve(self, comment):
+        email = self.player.email
+        if re.search('autoapprove', email, re.IGNORECASE):
+            armies = Army.objects.all()
+            army = None
+            for a in armies:
+                if re.search(f'{a.name}|{a.long_name}', comment, re.IGNORECASE):
+                    army = a
+                    break
+            if army:
+                list = Lists.objects.filter(Q(army_id=a.id) & Q(owner_id=self.player.id)).exists()
+                if not list:
+                    Lists.objects.create(owner_id=self.player.id, army=a, list='', name='Anon')
+                list = Lists.objects.get(Q(army_id=a.id) & Q(owner_id=self.player.id))
+                self.list_id = list.id
+                self.approved = True
+                self.comment = 'autoapproved'
+                self.save()
+                return True
+
+        return False
 
     def __str__(self):
         return f'{self.game.date}, {self.game.id}, {self.player}'

@@ -329,6 +329,8 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         fpr = form_op_result.save(commit=False)
         fpr.save()
 
+        fpr.auto_approve(fmr.comment)
+
         return redirect('t9a:home')
 
     def count_score(self, points, my, op, scenario):  # function to count score used in Result
