@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from t9a.models import Games, Results, Lists, GamingGroup
+from t9a.models import Games, Results, Lists, GamingGroup, HalfResults
 
 
 class UsernameForm(forms.ModelForm):
@@ -32,9 +32,22 @@ class MyResultForm(forms.ModelForm):
 
 class OpResultForm(forms.ModelForm):
     points = forms.IntegerField(label="Small points (VP auto-calculated)", required=True)
+
     class Meta:
         model = Results
         fields = ('player', 'points')
+
+
+class MyHalfResultForm(forms.ModelForm):
+    class Meta:
+        model = HalfResults
+        fields = ('list', 'comment')
+
+
+class OpHalfResultForm(forms.ModelForm):
+    class Meta:
+        model = HalfResults
+        fields = ('player',)
 
 
 class AddListForm(forms.ModelForm):

@@ -50,13 +50,35 @@ class Lists(models.Model):
     list = models.TextField()
     name = models.CharField(max_length=256)
     uses_supplement = models.BooleanField(default=False)
-    data_save = models.DateField(default=timezone.now)
+    parsed = models.BooleanField(default=False)
+    save_date = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ['army', 'owner', 'name']
 
     def __str__(self):
         return f'{self.army}, {self.owner}, {self.name}'
+
+
+class Units(models.Model):
+    points = models.IntegerField(null=False, default=0)
+    special = models.IntegerField(null=False, default=0)
+    unit = models.CharField(max_length=256)
+    army = models.ForeignKey('Army', on_delete=models.CASCADE)
+    save_date = models.DateTimeField(default=timezone.now)
+    list = models.ManyToManyField('Lists', through='ListsUnits')
+
+    def __str__(self):
+        return f'{self.army}, {self.points}, {self.unit} '
+
+
+class ListsUnits(models.Model):
+    list = models.ForeignKey('Lists', on_delete=models.CASCADE)
+    unit = models.ForeignKey('Units', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f'{self.list.name}, {self.unit}'
 
 
 class Games(models.Model):
@@ -123,7 +145,7 @@ class Results(models.Model):
     points = models.IntegerField()
     approved = models.BooleanField(null=True)
     first = models.BooleanField()
-    data_save = models.DateTimeField(default=timezone.now)
+    save_date = models.DateTimeField(default=timezone.now)
 
     def auto_approve(self, comment):
         email = self.player.email
@@ -175,6 +197,19 @@ class Results(models.Model):
             self.list.name,
             self.comment
         ]
+
+
+class HalfResults(models.Model):
+    choice_list = [
+        (1, 'win'),
+        (0, 'draw'),
+        (-1, 'loose')
+    ]
+    game = models.ForeignKey('Games', null=True, on_delete=models.SET_NULL)
+    player = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    list = models.ForeignKey('Lists', null=True, on_delete=models.SET_NULL)
+    comment = models.TextField(blank=True)
+    save_date = models.DateTimeField(default=timezone.now)
 
 
 class GamingGroup(models.Model):

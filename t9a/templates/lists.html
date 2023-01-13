@@ -11,7 +11,10 @@
 <ol>
 {% for list in lists %}
 <li>
-    {{list}} <a class="btn btn-success btn-sm" href="{% url 't9a:add-list' pk=list.id %}">Edit list</a> <a class="btn btn-primary btn-sm" href="{% url 't9a:parse-list' pk=list.id %}" role="button">Parse list</a>
+    {{list}} <a class="btn btn-success btn-sm" href="{% url 't9a:add-list' pk=list.id %}">Edit list</a>
+    {% if not list.parsed %}
+    <a class="btn btn-primary btn-sm" href="{% url 't9a:parse-list' pk=list.id %}" role="button">Parse list</a>
+    {% endif %}
     {% if list.uses_supplement %}uses supplement{% endif %}
   <pre>{{list.list}}</pre>
 </li>

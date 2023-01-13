@@ -16,6 +16,7 @@ urlpatterns = [
     path('my-account/', views.ChangeUsernameView.as_view(), name='my-account'),
     path('my-account/<str:opt>', views.ChangeUsernameView.as_view(), name='my-account'),
     path('add-game/', views.GameCreateView.as_view(), name='add-game'),
+    path('add-short-game/', views.AddGameHalfView.as_view(), name='add-short-game'),
     path('all-results/', views.AllResultsView.as_view(), name='all-results'),
     path('logout', views.LogoutView.as_view(), name='logout'),
     path('approve/<int:pk>', views.ApproveResultView.as_view(), name='approve-result'),

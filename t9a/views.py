@@ -12,9 +12,10 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from . import forms
-from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm
+from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm, MyHalfResultForm, \
+    OpHalfResultForm
 from .helpers import Ranking, ListParser
-from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup
+from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup, Units, ListsUnits
 
 
 class HomeView(View):
@@ -210,15 +211,25 @@ class ListsView(LoginRequiredMixin, View):
 class ParseList(LoginRequiredMixin, View):
     def get(self, request, pk):
         head = 'List parser'
-        list = Lists.objects.get(id=pk).list
+        list = Lists.objects.get(id=pk)
         parser = ListParser()
-        list_parser = parser.parser(list)
+        parsed_list = parser.parser(list.list)
+        if not list.parsed:
+            for pl in parsed_list:
+                if Units.objects.filter(Q(unit=pl['unit']) & Q(points=pl['points'])).exists():
+                    unit = Units.objects.get(Q(unit=pl['unit']) & Q(points=pl['points']))
+                else:
+                    unit = Units.objects.create(unit=pl['unit'], points=pl['points'], special=pl['special'],
+                                                army=list.army)
+                ListsUnits.objects.create(unit=unit, list=list, owner=list.owner)
+            list.parsed = True
+            list.save()
         return render(
             request,
             'parse-list.html',
             context={
                 'head': head,
-                'list_parser': list_parser
+                'parsed_list': parsed_list
             }
         )
 
@@ -310,7 +321,8 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
                 'form_game': form_game,
                 'form_my_result': form_my_result,
                 'form_op_result': form_op_result,
-                'head': head
+                'head': head,
+                'save_name': 'add-game'
             }
         )
 
@@ -374,6 +386,74 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
             score = 20 - score
         score += 3 * scenario
         return score
+
+
+class AddGameHalfView(LoginRequiredMixin, View):
+    def get(self, request):
+        head = 'Add game'
+        result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
+        if result:  # in form is displayed last  introduced value
+            event = Games.objects.get(id=result[0].game_id).event
+            points_event = Games.objects.get(id=result[0].game_id).points_event
+            event_type = Games.objects.get(id=result[0].game_id).event_type
+            list = result[0].list
+        else:
+            event = ''
+            points_event = 4500
+            list = 0
+            event_type = 'test'
+
+        init_game = {  # init value to game form
+            'event': event,
+            'points_event': points_event,
+            'date': datetime.now().strftime("%Y-%m-%d"),
+            'event_type': event_type
+        }
+        form_game = GameForm(initial=init_game)
+        init_my_result = {  # init value to my result form
+            'list': list
+        }
+        form_my_result = MyHalfResultForm(initial=init_my_result, prefix='my')  # we used prefix to distinctions form
+        form_my_result.fields['list'].queryset = Lists.objects.filter(
+            Q(owner_id=self.request.user.id) & Q(parsed=True))  # shows only my lists, modify options on the fly
+        form_op_result = OpHalfResultForm(prefix='op')  # there are that same fields
+        form_op_result.fields['player'].queryset = get_user_model().objects.filter(
+            ~Q(id=self.request.user.id)).order_by('username')
+
+        return render(
+            request,
+            'add-game.html',
+            context={
+                'form_game': form_game,
+                'form_my_result': form_my_result,
+                'form_op_result': form_op_result,
+                'head': head,
+                'save_game': 'add-short-game',
+            }
+        )
+    def post(self, request):
+        form_game = forms.GameForm(request.POST)
+        form_my_result = forms.MyHalfResultForm(request.POST, prefix='my')
+        form_op_result = forms.OpHalfResultForm(request.POST, prefix='op')
+        if form_game.is_valid() and form_my_result.is_valid() and form_op_result.is_valid():
+            fg = form_game.save(commit=False)  # first we save game form because results have FG to game
+            fg.save()
+        else:
+            raise ValidationError('Something went wrong.')
+        player = self.request.user.id
+        form_my_result.instance.player_id = player
+        form_my_result.instance.game_id = form_game.instance.id
+        fmr = form_my_result.save(commit=False)
+        fmr.save()
+
+        form_op_result.instance.game_id = form_game.instance.id  # we assign value to opponent result based on our form
+        #  form_op_result.instance.result = None
+
+        fpr = form_op_result.save(commit=False)
+        fpr.save()
+
+
+        return redirect('t9a:home')
 
 
 class AllResultsView(LoginRequiredMixin, UserPassesTestMixin, View):
