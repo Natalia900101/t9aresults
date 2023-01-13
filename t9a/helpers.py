@@ -1,3 +1,6 @@
+import re
+
+
 class AttributeDict(dict):
     _slots_ = ()
     _getattr_ = dict.__getitem__
@@ -61,3 +64,25 @@ class Ranking:
             o = self.class_name.objects.get(id=id)
             output += f"{o} {self.r[id].games} {self.r[id].win}, {self.r[id].result}\n"
         return output
+
+
+class ListParser:
+    def parser(self, list):
+        regex = re.finditer('^\s*(\d+)\s+-\s+(.+?)\s*$', list, re.MULTILINE)
+        list_group = []
+        sum = 0
+        for r in regex:
+            dupa = {}
+            dupa['points'] = int(r.group(1))
+            dupa['unit'] = r.group(2)
+            dupa['special'] = 200 if re.search('general|battle standard bearer', r.group(2), re.IGNORECASE) else 0
+            sum += dupa['points']
+            list_group.append(dupa)
+        last_regex = re.search('^\s*(\d+)\s*$', list, re.MULTILINE)
+        if last_regex:
+            if int(last_regex.group(1)) == sum:
+                return list_group
+            else:
+                return []
+        else:
+            return list_group

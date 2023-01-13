@@ -11,7 +11,7 @@
 <ol>
 {% for list in lists %}
 <li>
- <a href="{% url 't9a:add-list' pk=list.id %}">{{list}}</a><br/>
+    {{list}} <a class="btn btn-success btn-sm" href="{% url 't9a:add-list' pk=list.id %}">Edit list</a> <a class="btn btn-primary btn-sm" href="{% url 't9a:parse-list' pk=list.id %}" role="button">Parse list</a>
     {% if list.uses_supplement %}uses supplement{% endif %}
   <pre>{{list.list}}</pre>
 </li>

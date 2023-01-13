@@ -13,7 +13,7 @@ from django.views import View
 
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm
-from .helpers import Ranking
+from .helpers import Ranking, ListParser
 from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup
 
 
@@ -203,6 +203,22 @@ class ListsView(LoginRequiredMixin, View):
             context={
                 'lists': lists,
                 'head': head
+            }
+        )
+
+
+class ParseList(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        head = 'List parser'
+        list = Lists.objects.get(id=pk).list
+        parser = ListParser()
+        list_parser = parser.parser(list)
+        return render(
+            request,
+            'parse-list.html',
+            context={
+                'head': head,
+                'list_parser': list_parser
             }
         )
 

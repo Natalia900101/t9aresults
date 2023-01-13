@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Lists
+{% endblock %}
+
+{% block container %}
+<div >
+    <table class="table table-bordered border-black">
+      <thead>
+      <tr>
+            <th>Points</th>
+              <th>Special</th>
+              <th>Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lp in list_parser %}
+       <tr>
+            <td>{{lp.points}}</td>
+            <td>{{lp.special}}</td>
+            <td>{{lp.unit}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+{% endblock %}
