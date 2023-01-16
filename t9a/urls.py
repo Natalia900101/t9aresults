@@ -17,6 +17,8 @@ urlpatterns = [
     path('my-account/<str:opt>', views.ChangeUsernameView.as_view(), name='my-account'),
     path('add-game/', views.GameCreateView.as_view(), name='add-game'),
     path('add-short-game/', views.AddGameHalfView.as_view(), name='add-short-game'),
+    path('add-list-to-result/<int:pk>', views.AddListToResultView.as_view(), name='add-list-to-result'),
+    path('add-units-points/<int:pk>', views.AddUnitsPointsView.as_view(), name='add-units-points'),
     path('all-results/', views.AllResultsView.as_view(), name='all-results'),
     path('logout', views.LogoutView.as_view(), name='logout'),
     path('approve/<int:pk>', views.ApproveResultView.as_view(), name='approve-result'),
@@ -27,6 +29,5 @@ urlpatterns = [
     path('join-group/<int:pk>', views.JoinGroupView.as_view(), name='join-group'),
     path('leave-group/<int:pk>', views.LeaveGroupView.as_view(), name='leave-group'),
     path('group-ranking/<int:pk>', views.GroupRankingView.as_view(), name='group-ranking'),
-
 
 ]

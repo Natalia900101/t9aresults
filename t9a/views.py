@@ -1,4 +1,5 @@
 import csv
+import re
 from datetime import datetime
 
 from allauth.socialaccount.models import SocialAccount
@@ -13,9 +14,9 @@ from django.views import View
 
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm, MyHalfResultForm, \
-    OpHalfResultForm
+    OpHalfResultForm, AddListToResultForm, UnitsPointsForm
 from .helpers import Ranking, ListParser
-from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup, Units, ListsUnits
+from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup, Units, ListsUnits, HalfResults
 
 
 class HomeView(View):
@@ -37,6 +38,11 @@ class HomeView(View):
         for r in waiting_for_approval:
             r.myself = Results.objects.get(~Q(player_id=r.player_id)
                                            & Q(game_id=r.game_id))
+
+        list_to_be_added = HalfResults.objects.filter(Q(list_id__isnull=True) & Q(player_id=self.request.user.id))
+        for r in list_to_be_added:
+            r.opponent = HalfResults.objects.get(~Q(player_id=r.player_id)
+                                                 & Q(game_id=r.game_id))
 
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
@@ -73,6 +79,7 @@ class HomeView(View):
                 ],
                 'to_be_approved': to_be_approved,
                 'waiting_for_approval': waiting_for_approval,
+                'list_to_be_added': list_to_be_added,
                 'head': head,
                 'user_renamed': renamed
             }
@@ -431,6 +438,7 @@ class AddGameHalfView(LoginRequiredMixin, View):
                 'save_game': 'add-short-game',
             }
         )
+
     def post(self, request):
         form_game = forms.GameForm(request.POST)
         form_my_result = forms.MyHalfResultForm(request.POST, prefix='my')
@@ -452,7 +460,64 @@ class AddGameHalfView(LoginRequiredMixin, View):
         fpr = form_op_result.save(commit=False)
         fpr.save()
 
+        return redirect('t9a:home')
 
+
+class AddListToResultView(LoginRequiredMixin, View):
+    def get(self, request, pk=0):
+        head = 'Add list to result'
+        result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
+        if result:  # in form is displayed last  introduced value
+            list = result[0].list
+        else:
+            list = 0
+        result = HalfResults.objects.get(id=pk)
+        initial = {
+            'list': list,
+        }
+        form = AddListToResultForm(initial=initial)
+        form.fields['list'].queryset = Lists.objects.filter(
+            Q(owner_id=self.request.user.id) & Q(parsed=True))  # shows only my lists, modify options on the fly
+
+        return render(
+            request,
+            'approve-result.html',
+            context={
+                'form': form,
+                'head': head
+            }
+        )
+
+    def post(self, request, pk):
+        result = HalfResults.objects.get(Q(id=pk) & Q(player_id=self.request.user.id))
+        form = AddListToResultForm(request.POST, instance=result)
+
+        if form.is_valid():
+            form.save()
+        return redirect('t9a:home')
+
+
+class AddUnitsPointsView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        head = 'Add unit points'
+        units = ListsUnits.objects.filter(Q(list_id=pk) & Q(owner_id=self.request.user.id))
+        return render(
+            request,
+            'units-points.html',
+            context={
+                'units': units,
+                'head': head
+            }
+        )
+    def post(self, request, pk):
+        for v in request.POST:
+            if re.match('pp-(\d*)', v):
+                unit_id = re.match('pp-(\d*)', v)[1]
+                points_percentage =
+
+
+
+                print(unit_id, request.POST[v])
         return redirect('t9a:home')
 
 

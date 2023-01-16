@@ -28,9 +28,9 @@ SECRET_KEY = os.environ.get('DJ_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get('DJ_DEBUG', default=0))
 
-ALLOWED_HOSTS = ['wyniki.t9a.pl', '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://wyniki.t9a.pl']
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+ALLOWED_HOSTS = ['wyniki.t9a.pl', '127.0.0.1', '192.168.50.93']
+# CSRF_TRUSTED_ORIGINS = ['https://wyniki.t9a.pl']
+# SqECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 

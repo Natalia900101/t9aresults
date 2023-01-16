@@ -17,6 +17,30 @@ First login? You can <a class="btn btn-outline-success" href="{% url 't9a:my-acc
 <br>
 
 <div >
+    {% if list_to_be_added   %}
+    <h4 class="text-danger">I have to approve</h4>
+    <table class="table table-bordered border-danger">
+        <thead>
+        <tr>
+            <th></th>
+              <th>Event</th>
+              <th>Opponent</th>
+        </tr>
+        </thead>
+        <tbody>
+         {% for result in list_to_be_added %}
+        <tr>
+            <td><a class="btn btn-outline-danger" href="{% url 't9a:add-list-to-result' pk=result.id %}">Add List</a></td>
+            <td>{{result.game.event}}</td>
+            <td>{{result.opponent.player}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+<div >
     {% if waiting_for_approval %}
     <h4 class="text-success">Opponent has to approve</h4>
     <table class="table table-bordered border-success">

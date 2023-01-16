@@ -212,6 +212,22 @@ class HalfResults(models.Model):
     save_date = models.DateTimeField(default=timezone.now)
 
 
+class UnitsPoints(models.Model):
+    choice_list = [
+        (-2, '100%'),
+        (-1, '50%'),
+        (0, '0'),
+    ]
+    points_percentage = models.IntegerField(choices=choice_list)
+    points_special = models.BooleanField(default=False)
+    unit = models.ForeignKey('Units', on_delete=models.CASCADE)
+    list_unit = models.ForeignKey('ListsUnits', on_delete=models.CASCADE, null=True)
+    save_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.unit}'
+
+
 class GamingGroup(models.Model):
     name = models.CharField(max_length=256)
     comment = models.TextField()
