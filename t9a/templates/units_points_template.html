@@ -31,16 +31,17 @@
 elements = document.getElementsByClassName('clickme {{dir}}');
 for (let i=0; i < elements.length; i++) {
    elements[i].addEventListener('change', function (event) {
-       count_points("{{dir}}", event);
+       count_points("{{dir}}", "{{opdir}}", event);
 })
 }
 
-function count_points(dir, event) {
+function count_points(dir, opdir, event) {
     elements = document.getElementsByClassName('clickme '+ dir);
     sum = 0
     for (let i=0; i < elements.length; i++) {
       if (elements[i].checked == true && elements[i].type == "checkbox") {
-        sum -= elements[i].value;
+          console.log(sum)
+        sum += 1*elements[i].value;
         console.log(elements[i].id + "-100");
         pp100 = document.getElementById(elements[i].id + "-100");
         pp100.checked = true;
@@ -49,10 +50,10 @@ function count_points(dir, event) {
     for (let i=0; i < elements.length; i++) {
         if (elements[i].checked == true && elements[i].type == "radio") {
             //console.log("val-" + elements[i].id);
-            sum += Math.floor(elements[i].value * 0.5 * document.getElementById("val-" + elements[i].name).innerText);
+            sum -= Math.floor(elements[i].value * 0.5 * document.getElementById("val-" + elements[i].name).innerText);
         }
     }
-    document.getElementById(dir+'sum').value = sum
+    document.getElementById(opdir+'sum').value = sum
 }
     </script>
 </div>

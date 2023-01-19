@@ -13,14 +13,14 @@
     <div style="border: 1px dashed darkgreen">
     <h6>{{my_list.list.owner}}, {{my_list.list.name}}git</h6>
     {{my_form_res|crispy}}
-    {% with dir='my-' units=my_units %}
+    {% with dir='my-' opdir="op-" units=my_units %}
     {% include 'units_points_template.html' %}
     {% endwith %}
     </div>
 
     <div style="border: 1px dashed darkred">
     <h6>{{op_list.list.owner}}, {{op_list.list.name}}</h6>
-    {% with dir='op-' units=op_units %}
+    {% with dir='op-' opdir="my-" units=op_units %}
     {% include 'units_points_template.html' %}
     {% endwith %}
     </div>
