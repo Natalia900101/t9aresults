@@ -56,6 +56,16 @@ class AddListToResultForm(forms.ModelForm):
         fields = ('list',)
 
 
+class MyUnitPointsResultForm(forms.ModelForm):
+    first = forms.BooleanField(label="starting player", required=False)
+    comment = forms.CharField(max_length=256, required=False)
+
+    class Meta:
+        model = Results
+        fields = ('first', 'secondary', 'comment')
+
+
+
 class UnitsPointsForm(forms.ModelForm):
     class Meta:
         model = UnitsPoints

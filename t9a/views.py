@@ -14,9 +14,9 @@ from django.views import View
 
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm, MyHalfResultForm, \
-    OpHalfResultForm, AddListToResultForm, UnitsPointsForm
-from .helpers import Ranking, ListParser
-from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup, Units, ListsUnits, HalfResults
+    OpHalfResultForm, AddListToResultForm, UnitsPointsForm, MyUnitPointsResultForm
+from .helpers import Ranking, ListParser, HelpFunctions
+from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup, Units, ListsUnits, HalfResults, UnitsPoints
 
 
 class HomeView(View):
@@ -43,6 +43,13 @@ class HomeView(View):
         for r in list_to_be_added:
             r.opponent = HalfResults.objects.get(~Q(player_id=r.player_id)
                                                  & Q(game_id=r.game_id))
+        half_results = HalfResults.objects.filter(Q(player_id=self.request.user.id) & ~Q(closed=True) & Q(list_id__isnull=False))
+        add_points_half_results = []
+        for r in half_results:
+            r.opponent = HalfResults.objects.get(~Q(player_id=r.player_id)
+                                                 & Q(game_id=r.game_id))
+            if not r.opponent.list_id is None:
+                add_points_half_results.append(r)
 
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
@@ -53,6 +60,7 @@ class HomeView(View):
             rankingL.add(r.list_id, r.result, r.score)
             rankingA.add(r.list.army_id, r.result, r.score)
             rankingP.add(r.player_id, r.result, r.score)
+
         return render(
             request,
             'home.html',
@@ -81,7 +89,8 @@ class HomeView(View):
                 'waiting_for_approval': waiting_for_approval,
                 'list_to_be_added': list_to_be_added,
                 'head': head,
-                'user_renamed': renamed
+                'user_renamed': renamed,
+                'half_results': add_points_half_results,
             }
         )
 
@@ -89,18 +98,22 @@ class HomeView(View):
 class ApproveResultView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
         head = 'Approve result'
-        result = Results.objects.filter(player_id=self.request.user.id).order_by('-id')
-        if result:  # in form is displayed last  introduced value
-            list = result[0].list
-        else:
-            list = 0
         result = Results.objects.get(id=pk)
+        if isinstance(result.list_id, int):
+            list = result.list
+        else:
+            help_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(list_id__isnull=False)).order_by('-id')
+            if help_result:
+                list = help_result[0].list
         initial = {
             'list': list,
-            'approved': True
+            'approved': True,
         }
-        form = ApproveResultForm(initial=initial)
-        form.fields['list'].queryset = Lists.objects.filter(
+        form = ApproveResultForm(initial=initial, instance=result)
+        if isinstance(result.list_id, int):
+            form.fields['list'].queryset = Lists.objects.filter(id=result.list_id)
+        else:
+            form.fields['list'].queryset = Lists.objects.filter(
             owner_id=self.request.user.id)  # shows only my lists, modify options on the fly
 
         return render(
@@ -344,7 +357,8 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
             raise ValidationError('Something went wrong.')
         player = self.request.user.id
         form_my_result.instance.player_id = player
-        form_my_result.instance.score = self.count_score \
+        count_score = HelpFunctions()
+        form_my_result.instance.score = count_score.count_score \
             (form_game.instance.points_event, form_my_result.instance.points, form_op_result.instance.points,
              form_my_result.instance.secondary)
         score = form_my_result.instance.score
@@ -367,32 +381,6 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         fpr.auto_approve(fmr.comment)
 
         return redirect('t9a:home')
-
-    def count_score(self, points, my, op, scenario):  # function to count score used in Result
-        difference = my - op
-        fraction = abs(difference / points)
-        score = 0
-        if fraction <= 0.05:
-            score += 10
-        elif fraction <= 0.10:
-            score += 11
-        elif fraction <= 0.20:
-            score += 12
-        elif fraction <= 0.30:
-            score += 13
-        elif fraction <= 0.40:
-            score += 14
-        elif fraction <= 0.50:
-            score += 15
-        elif fraction <= 0.70:
-            score += 16
-        else:
-            score += 17
-
-        if difference < 0:
-            score = 20 - score
-        score += 3 * scenario
-        return score
 
 
 class AddGameHalfView(LoginRequiredMixin, View):
@@ -500,24 +488,87 @@ class AddListToResultView(LoginRequiredMixin, View):
 class AddUnitsPointsView(LoginRequiredMixin, View):
     def get(self, request, pk):
         head = 'Add unit points'
-        units = ListsUnits.objects.filter(Q(list_id=pk) & Q(owner_id=self.request.user.id))
+        game = Games.objects.get(id=pk)
+        my_comment = HalfResults.objects.get(Q(game_id=pk) & Q(player_id=self.request.user.id)).comment
+        form_game = GameForm(instance=game)
+        my_list = HalfResults.objects.get(Q(game_id=game.id) & Q(player_id=self.request.user.id))
+        op_list = HalfResults.objects.get(Q(game_id=game.id) & ~Q(player_id=self.request.user.id))
+        my_units = ListsUnits.objects.filter(Q(list_id=my_list.list_id))
+        op_units = ListsUnits.objects.filter(Q(list_id=op_list.list_id))
+        my_form_res = MyUnitPointsResultForm(initial={'comment': my_comment})
         return render(
             request,
             'units-points.html',
             context={
-                'units': units,
+                'my_list.id': my_list.id,
+                'form_game': form_game,
+                'my_list': my_list,
+                'my_form_res': my_form_res,
+                'op_list': op_list,
+                'my_units': my_units,
+                'op_units': op_units,
                 'head': head
             }
         )
+
     def post(self, request, pk):
-        for v in request.POST:
-            if re.match('pp-(\d*)', v):
-                unit_id = re.match('pp-(\d*)', v)[1]
-                points_percentage =
+        form_game = forms.GameForm(request.POST, instance=Games.objects.get(id=pk))
+        my_form_res = forms.MyUnitPointsResultForm(request.POST)
+        if form_game.is_valid():
+            form_game.save()
+        if not my_form_res.is_valid():
+            raise ("błąd")
+        player = self.request.user.id
+        game_id = form_game.instance.id
+        count_score = HelpFunctions()
+        my_points = int(request.POST.get('my-sum'))
+        op_points = int(request.POST.get('op-sum'))
+        my_half_result = HalfResults.objects.get(Q(game_id=pk) & Q(player_id=self.request.user.id))
+        op_half_result = HalfResults.objects.get(Q(game_id=pk) & ~Q(player_id=self.request.user.id))
+        opponent = op_half_result.player_id
+        my_list = my_half_result.list_id
+        op_list = op_half_result.list_id
+        if my_points < 0 and op_points < 0:
+            temp = my_points
+            my_points = -1 * op_points
+            op_points = -1 * temp
+        my_score = count_score.count_score \
+            (form_game.instance.points_event, my_points, op_points, my_form_res.instance.secondary)
+        result = 1 if my_score > 10 else -1 if my_score < 10 else 0
 
+        my_result = Results.objects.create(
+            game_id=game_id,
+            player_id=player,
+            secondary=my_form_res.instance.secondary,
+            score=my_score,
+            result=result,
+            points=my_points,
+            list_id=my_list,
+            first=my_form_res.instance.first,
+            comment=my_form_res.instance.comment,
+            approved=True,
+        )
+        op_result = Results.objects.create(
+            game_id=game_id,
+            player_id=opponent,
+            secondary=my_form_res.instance.secondary * -1,
+            score=20 - my_score,
+            result=result * -1,
+            points=op_points,
+            list_id=op_list,
+            first=not my_form_res.instance.first,
+            comment=op_half_result.comment,
+        )
 
+        my_half_result.closed = True
+        my_half_result.save()
+        op_half_result.closed = True
+        op_half_result.save()
 
-                print(unit_id, request.POST[v])
+        unit = HelpFunctions()
+        unit.create_unit_points(request, 'my-', my_list, my_result.id)
+        unit.create_unit_points(request, 'op-', op_list, op_result.id)
+
         return redirect('t9a:home')
 
 

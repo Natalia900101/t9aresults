@@ -209,6 +209,7 @@ class HalfResults(models.Model):
     player = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     list = models.ForeignKey('Lists', null=True, on_delete=models.SET_NULL)
     comment = models.TextField(blank=True)
+    closed = models.BooleanField(default=False)
     save_date = models.DateTimeField(default=timezone.now)
 
 
@@ -222,6 +223,8 @@ class UnitsPoints(models.Model):
     points_special = models.BooleanField(default=False)
     unit = models.ForeignKey('Units', on_delete=models.CASCADE)
     list_unit = models.ForeignKey('ListsUnits', on_delete=models.CASCADE, null=True)
+    result = models.ForeignKey('Results', on_delete=models.CASCADE, null=True)
+    list = models.ForeignKey('Lists', on_delete=models.CASCADE, null=True)
     save_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

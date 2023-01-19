@@ -1,5 +1,7 @@
 import re
 
+from t9a.models import ListsUnits, UnitsPoints
+
 
 class AttributeDict(dict):
     _slots_ = ()
@@ -86,3 +88,57 @@ class ListParser:
                 return []
         else:
             return list_group
+
+
+class HelpFunctions:
+    def count_score(self, points, my, op, scenario):  # function to count score used in Result
+        difference = my - op
+        fraction = abs(difference / points)
+        score = 0
+        if fraction <= 0.05:
+            score += 10
+        elif fraction <= 0.10:
+            score += 11
+        elif fraction <= 0.20:
+            score += 12
+        elif fraction <= 0.30:
+            score += 13
+        elif fraction <= 0.40:
+            score += 14
+        elif fraction <= 0.50:
+            score += 15
+        elif fraction <= 0.70:
+            score += 16
+        else:
+            score += 17
+
+        if difference < 0:
+            score = 20 - score
+        score += 3 * scenario
+        return score
+
+    def create_unit_points(self, request, prefix, list_id, result_id):
+        unit_point = {}
+        for v in request.POST:
+            if re.match(f'{prefix}pp-(\d*)', v):
+                list_unit_id = int(re.match(f'{prefix}pp-(\d*)', v)[1])
+                if not list_unit_id in unit_point:
+                    unit_point[list_unit_id] = {}
+                unit_point[list_unit_id]['unit_id'] = ListsUnits.objects.get(id=list_unit_id).unit_id
+                unit_point[list_unit_id]['points_percentage'] = request.POST[v]
+                unit_point[list_unit_id]['points_special'] = False
+
+        for v in request.POST:
+            if re.match(f'{prefix}ps-(\d*)', v):
+                list_unit_id = int(re.match(f'{prefix}ps-(\d*)', v)[1])
+                unit_point[list_unit_id]['points_special'] = True
+
+        for list_unit_id in unit_point:
+            UnitsPoints.objects.create(
+                points_percentage=unit_point[list_unit_id]['points_percentage'],
+                points_special=unit_point[list_unit_id]['points_special'],
+                list_unit_id=list_unit_id,
+                unit_id=unit_point[list_unit_id]['unit_id'],
+                list_id=list_id,
+                result_id=result_id,
+            )
