@@ -39,17 +39,14 @@ class HomeView(View):
             r.myself = Results.objects.get(~Q(player_id=r.player_id)
                                            & Q(game_id=r.game_id))
 
-        list_to_be_added = HalfResults.objects.filter(Q(list_id__isnull=True) & Q(player_id=self.request.user.id))
+        list_to_be_added = HalfResults.objects.filter(Q(list_id__isnull=True) & Q(player_id=self.request.user.id) & Q(closed=False))
         for r in list_to_be_added:
             r.opponent = HalfResults.objects.get(~Q(player_id=r.player_id)
                                                  & Q(game_id=r.game_id))
         half_results = HalfResults.objects.filter(Q(player_id=self.request.user.id) & ~Q(closed=True) & Q(list_id__isnull=False))
-        add_points_half_results = []
         for r in half_results:
             r.opponent = HalfResults.objects.get(~Q(player_id=r.player_id)
                                                  & Q(game_id=r.game_id))
-            if not r.opponent.list_id is None:
-                add_points_half_results.append(r)
 
         rankingL = Ranking(Lists)
         rankingA = Ranking(Army)
@@ -90,7 +87,7 @@ class HomeView(View):
                 'list_to_be_added': list_to_be_added,
                 'head': head,
                 'user_renamed': renamed,
-                'half_results': add_points_half_results,
+                'half_results': half_results,
             }
         )
 
@@ -568,6 +565,8 @@ class AddUnitsPointsView(LoginRequiredMixin, View):
         unit = HelpFunctions()
         unit.create_unit_points(request, 'my-', my_list, my_result.id)
         unit.create_unit_points(request, 'op-', op_list, op_result.id)
+
+        op_result.auto_approve(my_result.comment)
 
         return redirect('t9a:home')
 
