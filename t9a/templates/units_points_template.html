@@ -40,7 +40,6 @@ function count_points(dir, opdir, event) {
     sum = 0
     for (let i=0; i < elements.length; i++) {
       if (elements[i].checked == true && elements[i].type == "checkbox") {
-          console.log(sum)
         sum += 1*elements[i].value;
         console.log(elements[i].id + "-100");
         pp100 = document.getElementById(elements[i].id + "-100");
