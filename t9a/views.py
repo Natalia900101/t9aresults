@@ -128,7 +128,6 @@ class ApproveResultView(LoginRequiredMixin, View):
 
             check_list = Lists.objects.filter(Q(id=form.instance.list_id) & Q(owner_id=self.request.user.id)).count()
             result = Results.objects.get(id=pk)
-            print(check_list)
             if check_list == 1 and result.player_id == self.request.user.id:
                 result.approved = form.instance.approved
                 result.list_id = form.instance.list_id
