@@ -173,12 +173,26 @@ class ChangeUsernameView(LoginRequiredMixin, View):
 
 
 class ResultView(LoginRequiredMixin, View):
-    def get(self, request, pk=0):
-        head = 'My results'
-        if pk == 0:
+    def get(self, request, pk=""):
+
+        if pk == "":
             my_result = Results.objects.filter(player_id=self.request.user.id)
+            head = 'My results'
         else:
-            my_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(game_id=pk))
+            head = 'Results'
+            check = re.match('user:(\d+)', pk)
+            if check:
+                my_result = Results.objects.filter(player_id=int(check.group(1)))
+            check = re.match('lists:(\d+)', pk)
+            if check:
+                lists = Lists.objects.filter(id=int(check.group(1)))
+                my_result = Results.objects.filter(list_id__in=lists)
+            check = re.match('army:(\d+)', pk)
+            if check:
+                lists = Lists.objects.filter(army_id=int(check.group(1)))
+                game_id = Results.objects.filter(Q(list_id__in=lists)).values_list('game_id', flat=True)
+                my_result = Results.objects.filter(Q(game_id__in=game_id) & Q(first=True))
+
         for r in my_result:
             r.opponent = Results.objects.get(~Q(player_id=r.player_id)
                                              & Q(game_id=r.game_id))

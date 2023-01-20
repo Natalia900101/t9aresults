@@ -15,6 +15,7 @@ class Ranking:
         self.class_name = class_name
         self._stats = False
         self.object = None
+        self.class_as_string = class_name._meta.model_name
 
     def add(self, id, result, score):
         if not id in self.r:
@@ -42,6 +43,7 @@ class Ranking:
             for s in self.r[id].score:
                 self.r[id].sum += s
             self.r[id].avg = self.r[id].sum / self.r[id].games if self.r[id].games > 0 else 1
+            self.r[id].pk = f'{self.class_as_string}:{id}'
 
         self._stats = True
         return self

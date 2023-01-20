@@ -25,7 +25,7 @@
     <tbody>
     {% for result in r.ranking %}
     <tr>
-      <td class="">{{result.object}}</td>
+        <td class=""><a href="{% url 't9a:results' pk=result.pk  %}"> {{result.object}} </a></td>
       <td class="win">{{result.win}}</td>
       <td class="draw">{{result.draw}}</td>
       <td class="loose">{{result.loose}}</td>

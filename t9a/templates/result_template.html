@@ -44,7 +44,7 @@
       <td><a href="{% url 't9a:lists' pk=result.list.id %}" title="{{result.list}}">{{ result.list.name}}</a></td>
       <td>{{result.get_secondary_display}}</td>
       <td>{{result.points }}</td>
-      <td>{{result.score}}:{{result.opponent.score}}</td>
+      <td style="background-color: lightyellow"><b>{{result.score}}:{{result.opponent.score}}</b></td>
       <td>{{result.opponent.points}}</td>
       <td>{{result.opponent.get_secondary_display}}</td>
       <td><a href="{% url 't9a:lists' pk=result.opponent.list.id %}" title="{{result.opponent.list}}">{{result.opponent.list.name}}</a></td>
