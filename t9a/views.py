@@ -96,6 +96,7 @@ class ApproveResultView(LoginRequiredMixin, View):
     def get(self, request, pk=0):
         head = 'Approve result'
         result = Results.objects.get(id=pk)
+        list = 0
         if isinstance(result.list_id, int):
             list = result.list
         else:
