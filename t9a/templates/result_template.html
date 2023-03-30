@@ -30,7 +30,7 @@
     </thead>
     <tbody>
     {% for result in results %}
-    {% if result.opponent and result.opponent.list %}
+    {% if result.opponent and result.opponent.list and result.list %}
     <tr>
       <td>{{result.game.id}}</td>
       <td>{{result.game.date|date:"Y-m-d"}}</td>
