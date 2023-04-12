@@ -1,7 +1,9 @@
+import os
 import re
 
 from django.core.mail import send_mail
 
+from config.settings import EMAIL_SENDER
 from t9a.models import ListsUnits, UnitsPoints
 
 
@@ -154,6 +156,6 @@ class SendEmail:
         message = f'Hello {recipient_name}!\n\n' \
                   f'You have result to complete follow {link} and do it.\n\n' \
                   f'-- \nTeam t9a.wyniki'
-        from_email = 'from@yourdjangoapp.com'
+        from_email = EMAIL_SENDER
         recipient_list = [recipient]
         send_mail(subject, message, from_email, recipient_list)

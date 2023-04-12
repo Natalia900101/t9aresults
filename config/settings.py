@@ -173,4 +173,5 @@ EMAIL_HOST = os.environ.get('SMTP_HOST')
 EMAIL_PORT = os.environ.get('SMTP_PORT')
 EMAIL_HOST_USER = os.environ.get('SMTP_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('SMTP_PASS')
+EMAIL_SENDER = os.environ.get('SMTP_SENDER')
 EMAIL_USE_TLS = True
