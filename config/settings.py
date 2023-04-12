@@ -167,3 +167,10 @@ SOCIALACCOUNT_PROVIDERS = {
 SITE_ID = 2
 LOGIN_REDIRECT_URL = 't9a:home'
 LOGOUT_REDIRECT_URL = 't9a:home'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('SMTP_HOST')
+EMAIL_PORT = os.environ.get('SMTP_PORT')
+EMAIL_HOST_USER = os.environ.get('SMTP_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('SMTP_PASS')
+EMAIL_USE_TLS = True

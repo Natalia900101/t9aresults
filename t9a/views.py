@@ -10,12 +10,14 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import View
+from django.core.mail import send_mail
 
 from . import forms
 from .forms import UsernameForm, GameForm, MyResultForm, OpResultForm, AddListForm, ApproveResultForm, MyHalfResultForm, \
     OpHalfResultForm, AddListToResultForm, UnitsPointsForm, MyUnitPointsResultForm
-from .helpers import Ranking, ListParser, HelpFunctions
+from .helpers import Ranking, ListParser, HelpFunctions, SendEmail
 from .models import Results, Lists, Games, Army, UserRenamed, GamingGroup, Units, ListsUnits, HalfResults, UnitsPoints
 
 
@@ -39,11 +41,13 @@ class HomeView(View):
             r.myself = Results.objects.get(~Q(player_id=r.player_id)
                                            & Q(game_id=r.game_id))
 
-        list_to_be_added = HalfResults.objects.filter(Q(list_id__isnull=True) & Q(player_id=self.request.user.id) & Q(closed=False))
+        list_to_be_added = HalfResults.objects.filter(
+            Q(list_id__isnull=True) & Q(player_id=self.request.user.id) & Q(closed=False))
         for r in list_to_be_added:
             r.opponent = HalfResults.objects.get(~Q(player_id=r.player_id)
                                                  & Q(game_id=r.game_id))
-        half_results = HalfResults.objects.filter(Q(player_id=self.request.user.id) & ~Q(closed=True) & Q(list_id__isnull=False))
+        half_results = HalfResults.objects.filter(
+            Q(player_id=self.request.user.id) & ~Q(closed=True) & Q(list_id__isnull=False))
         for r in half_results:
             r.opponent = HalfResults.objects.get(~Q(player_id=r.player_id)
                                                  & Q(game_id=r.game_id))
@@ -100,7 +104,8 @@ class ApproveResultView(LoginRequiredMixin, View):
         if isinstance(result.list_id, int):
             list = result.list
         else:
-            help_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(list_id__isnull=False)).order_by('-id')
+            help_result = Results.objects.filter(Q(player_id=self.request.user.id) & Q(list_id__isnull=False)).order_by(
+                '-id')
             if help_result:
                 list = help_result[0].list
         initial = {
@@ -112,7 +117,7 @@ class ApproveResultView(LoginRequiredMixin, View):
             form.fields['list'].queryset = Lists.objects.filter(id=result.list_id)
         else:
             form.fields['list'].queryset = Lists.objects.filter(
-            owner_id=self.request.user.id)  # shows only my lists, modify options on the fly
+                owner_id=self.request.user.id)  # shows only my lists, modify options on the fly
 
         return render(
             request,
@@ -390,6 +395,10 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         fpr.save()
 
         fpr.auto_approve(fmr.comment)
+        send_email = SendEmail()
+        send_email.send_approval_email(fpr.player.email,
+                                       request.build_absolute_uri(reverse('t9a:approve-result', kwargs={'pk': fpr.id})),
+                                       fpr.player.username)
 
         return redirect('t9a:home')
 

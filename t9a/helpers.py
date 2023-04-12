@@ -1,5 +1,7 @@
 import re
 
+from django.core.mail import send_mail
+
 from t9a.models import ListsUnits, UnitsPoints
 
 
@@ -144,3 +146,14 @@ class HelpFunctions:
                 list_id=list_id,
                 result_id=result_id,
             )
+
+
+class SendEmail:
+    def send_approval_email(self, recipient, link, recipient_name):
+        subject = 'Result for approval in t9a'
+        message = f'Hello {recipient_name}!\n\n' \
+                  f'You have result to complete follow {link} and do it.\n\n' \
+                  f'-- \nTeam t9a.wyniki'
+        from_email = 'from@yourdjangoapp.com'
+        recipient_list = [recipient]
+        send_mail(subject, message, from_email, recipient_list)
