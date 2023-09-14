@@ -124,7 +124,8 @@ First login? You can <a class="btn btn-outline-success" href="{% url 't9a:my-acc
 </div>
 
 {% include 'rankings_template.html' %}
-
+{% else %}
+<h2>Please log in to view site contents</h2>
 {% endif %}
 
 

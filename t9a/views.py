@@ -398,7 +398,8 @@ class GameCreateView(LoginRequiredMixin, View):  # view to add games and results
         send_email = SendEmail()
         send_email.send_approval_email(fpr.player.email,
                                        request.build_absolute_uri(reverse('t9a:approve-result', kwargs={'pk': fpr.id})),
-                                       fpr.player.username)
+                                       fpr.player.username)  # there is no exception handling because function
+        # doesn't return error when email address doesn't exist
 
         return redirect('t9a:home')
 
